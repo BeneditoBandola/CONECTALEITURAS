@@ -12,11 +12,8 @@ import tempfile
 import time
 import unicodedata
 import urllib.parse
-from fpdf import FPDF
-import folium
 from PIL import Image
 import pandas as pd
-from streamlit_folium import st_folium
 import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
@@ -100,7 +97,7 @@ TEMAS_CORES = {
     "1. Padrão Atual (Clean Executivo)": {
         "bg_app": "#F1F5F9",
         "bg_header": "#F1F5F9",
-        "texto": "#0F172A",
+        "texto": "#000000",
         "primario": "#2563EB",
         "secundario": "#1E3A8A",
         "card_bg": "#FFFFFF",
@@ -109,7 +106,7 @@ TEMAS_CORES = {
     "2. Midnight Dark (Modo Noturno)": {
         "bg_app": "#0F172A",
         "bg_header": "#0F172A",
-        "texto": "#F8FAFC",
+        "texto": "#000000",
         "primario": "#3B82F6",
         "secundario": "#60A5FA",
         "card_bg": "#1E293B",
@@ -118,7 +115,7 @@ TEMAS_CORES = {
     "3. Slate Moderno (Cinza Metálico)": {
         "bg_app": "#E2E8F0",
         "bg_header": "#E2E8F0",
-        "texto": "#1E293B",
+        "texto": "#000000",
         "primario": "#475569",
         "secundario": "#0F172A",
         "card_bg": "#FFFFFF",
@@ -127,7 +124,7 @@ TEMAS_CORES = {
     "4. Emerald Forest (Verde Esmeralda)": {
         "bg_app": "#ECFDF5",
         "bg_header": "#ECFDF5",
-        "texto": "#064E3B",
+        "texto": "#000000",
         "primario": "#059669",
         "secundario": "#065F46",
         "card_bg": "#FFFFFF",
@@ -136,7 +133,7 @@ TEMAS_CORES = {
     "5. Ocean Blue (Azul Oceano Profundo)": {
         "bg_app": "#EFF6FF",
         "bg_header": "#EFF6FF",
-        "texto": "#1E3A8A",
+        "texto": "#000000",
         "primario": "#1D4ED8",
         "secundario": "#1E40AF",
         "card_bg": "#FFFFFF",
@@ -145,7 +142,7 @@ TEMAS_CORES = {
     "6. Sunset Warm (Quente / Âmbar)": {
         "bg_app": "#FFFBEB",
         "bg_header": "#FFFBEB",
-        "texto": "#78350F",
+        "texto": "#000000",
         "primario": "#D97706",
         "secundario": "#92400E",
         "card_bg": "#FFFFFF",
@@ -154,7 +151,7 @@ TEMAS_CORES = {
     "7. Royal Purple (Roxo Realeza)": {
         "bg_app": "#F5F3FF",
         "bg_header": "#F5F3FF",
-        "texto": "#4C1D95",
+        "texto": "#000000",
         "primario": "#7C3AED",
         "secundario": "#5B21B6",
         "card_bg": "#FFFFFF",
@@ -163,7 +160,7 @@ TEMAS_CORES = {
     "8. Crimson Executive (Vinho / Executivo)": {
         "bg_app": "#FFF1F2",
         "bg_header": "#FFF1F2",
-        "texto": "#881337",
+        "texto": "#000000",
         "primario": "#E11D48",
         "secundario": "#9F1239",
         "card_bg": "#FFFFFF",
@@ -172,7 +169,7 @@ TEMAS_CORES = {
     "9. Cyberpunk Neon (Contraste Máximo)": {
         "bg_app": "#030712",
         "bg_header": "#030712",
-        "texto": "#F9FAFB",
+        "texto": "#000000",
         "primario": "#06B6D4",
         "secundario": "#38BDF8",
         "card_bg": "#111827",
@@ -181,7 +178,7 @@ TEMAS_CORES = {
     "10. Coffee Minimal (Minimalista Café)": {
         "bg_app": "#FDFBF7",
         "bg_header": "#FDFBF7",
-        "texto": "#3D2914",
+        "texto": "#000000",
         "primario": "#8C6239",
         "secundario": "#593E25",
         "card_bg": "#FFFFFF",
@@ -413,6 +410,18 @@ def obter_foto_promotor(nome):
     nome_limpo_orig = nome.strip()
     nome_limpo_baixo = nome_limpo_orig.lower()
 
+    # Tratamento especial para nomes exatos conforme arquivos no GitHub (Carolina e Saruete)
+    if "carolina" in nome_limpo_baixo:
+        for arq_carolina in ["carolina.jpg", "carolina.png", "Carolina.jpg", "Carolina.png"]:
+            caminho_c = os.path.join(pasta_alvo, arq_carolina)
+            if os.path.exists(caminho_c):
+                return Image.open(caminho_c)
+    if "saruete" in nome_limpo_baixo:
+        for arq_saruete in ["Sarute.png", "Sarute.jpg", "Sarute.JPG", "Sarute.PNG", "Saruete.png", "Saruete.jpg"]:
+            caminho_s = os.path.join(pasta_alvo, arq_saruete)
+            if os.path.exists(caminho_s):
+                return Image.open(caminho_s)
+
     for ext in [".jpg", ".jpeg", ".png", ".JPG", ".PNG"]:
         teste = os.path.join(pasta_alvo, nome_limpo_orig + ext)
         if os.path.exists(teste):
@@ -564,22 +573,22 @@ with col_t2:
 
 t = TEMAS_CORES[nome_tema_selecionado]
 
-# --- APLICAÇÃO DINÂMICA DO TEMA ESCOLHIDO VIA CSS ---
+# --- APLICAÇÃO DINÂMICA DO TEMA ESCOLHIDO VIA CSS (Nomes e textos em preto) ---
 st.markdown(
     f"""
     <style>
         [data-testid="stAppViewContainer"] {{ background-color: {t['bg_app']} !important; }}
         [data-testid="stHeader"] {{ background-color: {t['bg_header']} !important; }}
         [data-testid="stSidebar"] {{ display: none; }}
-        h1, h2, h3, h4, p, label, strong, b, span {{ color: {t['texto']} !important; font-family: 'Segoe UI', sans-serif; }}
+        h1, h2, h3, h4, p, label, strong, b, span, th, td {{ color: #000000 !important; font-family: 'Segoe UI', sans-serif; }}
         input, textarea, select {{
             background-color: {t['card_bg']} !important;
-            color: {t['texto']} !important;
+            color: #000000 !important;
             border: 1px solid {t['borda']} !important;
         }}
         div[data-baseweb="select"] > div {{
             background-color: {t['card_bg']} !important;
-            color: {t['texto']} !important;
+            color: #000000 !important;
             border: 1px solid {t['borda']} !important;
         }}
         div.stButton > button {{
@@ -608,7 +617,7 @@ st.markdown(
 )
 
 st.markdown(
-    f"<div style='text-align: center; font-size: 14px; font-weight: bold; color: {t['secundario']}; margin-top: 5px; margin-bottom: 10px;'>Periodo Ativo no Painel: <u>{periodo_atual}</u></div>",
+    f"<div style='text-align: center; font-size: 14px; font-weight: bold; color: #000000; margin-top: 5px; margin-bottom: 10px;'>Periodo Ativo no Painel: <u>{periodo_atual}</u></div>",
     unsafe_allow_html=True,
 )
 st.markdown("---")
@@ -685,7 +694,7 @@ with col_btn2:
         st.rerun()
 
 st.markdown(
-    f"<div style='text-align: right; font-size: 11px; color: #64748B; margin-top: -5px; margin-bottom: 10px;'>Última atualização do arquivo: <b>{horario_arquivo_str}</b></div>",
+    f"<div style='text-align: right; font-size: 11px; color: #000000; margin-top: -5px; margin-bottom: 10px;'>Última atualização do arquivo: <b>{horario_arquivo_str}</b></div>",
     unsafe_allow_html=True,
 )
 
@@ -741,7 +750,7 @@ if df is not None and not df.empty:
 
         if ativo_hoje:
             st.markdown(
-                f"<h3 style='color:{t['secundario']}; margin-top: 10px;'>Leituras Feitas Hoje (Agrupadas por Promotor) — {nome_curto.upper()}</h3>",
+                f"<h3 style='color:#000000; margin-top: 10px;'>Leituras Feitas Hoje (Agrupadas por Promotor) — {nome_curto.upper()}</h3>",
                 unsafe_allow_html=True,
             )
             hoje = date.today()
@@ -763,22 +772,22 @@ if df is not None and not df.empty:
                         with c_img:
                             st.image(foto_prom, width=130)
                             st.markdown(
-                                f"<div style='font-size: 15px; font-weight: bold; color: {t['texto']}; text-align: center; margin-top: 6px;'>{prom}</div>",
+                                f"<div style='font-size: 15px; font-weight: bold; color: #000000; text-align: center; margin-top: 6px;'>{prom}</div>",
                                 unsafe_allow_html=True,
                             )
                         with c_resumo:
                             st.markdown(
-                                f"<div style='font-size: 14px; font-weight: bold; color: {t['secundario']}; margin-bottom: 6px;'>Quantidade de Leituras por Item (KPI):</div>",
+                                f"<div style='font-size: 14px; font-weight: bold; color: #000000; margin-bottom: 6px;'>Quantidade de Leituras por Item (KPI):</div>",
                                 unsafe_allow_html=True,
                             )
                             badges_html = "<div style='display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px;'>"
                             for item_nome, qtd in contagem_itens.items():
-                                badges_html += f"<span style='background-color: {t['bg_app']}; border: 1px solid {t['borda']}; color: {t['primario']}; padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: 600;'><b>{qtd}x</b> {item_nome}</span>"
+                                badges_html += f"<span style='background-color: {t['bg_app']}; border: 1px solid {t['borda']}; color: #000000; padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: 600;'><b>{qtd}x</b> {item_nome}</span>"
                             badges_html += "</div>"
                             st.markdown(badges_html, unsafe_allow_html=True)
 
                             st.markdown(
-                                f"<div style='font-size: 13px; font-weight: bold; color: {t['texto']}; margin-bottom: 4px;'>Lojas, Cidades e Status Registrados:</div>",
+                                f"<div style='font-size: 13px; font-weight: bold; color: #000000; margin-bottom: 4px;'>Lojas, Cidades e Status Registrados:</div>",
                                 unsafe_allow_html=True,
                             )
                             for _, r in df_p.iterrows():
@@ -787,7 +796,7 @@ if df is not None and not df.empty:
                                 s_nome = r.get(col_status, "N/A")
                                 i_nome = r.get(col_item, "N/A")
                                 st.markdown(
-                                    f"<div style='font-size: 12px; color: {t['texto']}; margin-bottom: 2px;'>• <b>{i_nome}</b> | Loja: <b>{l_nome}</b> | Cidade: <b>{c_nome}</b> | Status: <b>{s_nome}</b></div>",
+                                    f"<div style='font-size: 12px; color: #000000; margin-bottom: 2px;'>• <b>{i_nome}</b> | Loja: <b>{l_nome}</b> | Cidade: <b>{c_nome}</b> | Status: <b>{s_nome}</b></div>",
                                     unsafe_allow_html=True,
                                 )
                         st.markdown("</div>", unsafe_allow_html=True)
@@ -803,19 +812,19 @@ if df is not None and not df.empty:
 
         ck1, ck2, ck3, ck4 = st.columns(4)
         with ck1:
-            st.markdown(f"<div style='background: {t['card_bg']}; border: 1px solid {t['borda']}; border-left: 6px solid {t['primario']}; padding: 16px; border-radius: 10px;'><div style='font-size: 12px; color: {t['texto']}; font-weight: bold;'>META TOTAL</div><div style='font-size: 26px; font-weight: bold; color: {t['secundario']}; margin-top: 4px;'>{meta_total_f}</div></div>", unsafe_allow_html=True)
+            st.markdown(f"<div style='background: {t['card_bg']}; border: 1px solid {t['borda']}; border-left: 6px solid {t['primario']}; padding: 16px; border-radius: 10px;'><div style='font-size: 12px; color: #000000; font-weight: bold;'>META TOTAL</div><div style='font-size: 26px; font-weight: bold; color: #000000; margin-top: 4px;'>{meta_total_f}</div></div>", unsafe_allow_html=True)
         with ck2:
-            st.markdown(f"<div style='background: {t['card_bg']}; border: 1px solid {t['borda']}; border-left: 6px solid #16A34A; padding: 16px; border-radius: 10px;'><div style='font-size: 12px; color: {t['texto']}; font-weight: bold;'>APROVADOS</div><div style='font-size: 26px; font-weight: bold; color: #16A34A; margin-top: 4px;'>{tot_aprovados_f}</div></div>", unsafe_allow_html=True)
+            st.markdown(f"<div style='background: {t['card_bg']}; border: 1px solid {t['borda']}; border-left: 6px solid #16A34A; padding: 16px; border-radius: 10px;'><div style='font-size: 12px; color: #000000; font-weight: bold;'>APROVADOS</div><div style='font-size: 26px; font-weight: bold; color: #16A34A; margin-top: 4px;'>{tot_aprovados_f}</div></div>", unsafe_allow_html=True)
         with ck3:
-            st.markdown(f"<div style='background: {t['card_bg']}; border: 1px solid {t['borda']}; border-left: 6px solid #D97706; padding: 16px; border-radius: 10px;'><div style='font-size: 12px; color: {t['texto']}; font-weight: bold;'>PENDENTES</div><div style='font-size: 26px; font-weight: bold; color: #D97706; margin-top: 4px;'>{tot_pendentes_f}</div></div>", unsafe_allow_html=True)
+            st.markdown(f"<div style='background: {t['card_bg']}; border: 1px solid {t['borda']}; border-left: 6px solid #D97706; padding: 16px; border-radius: 10px;'><div style='font-size: 12px; color: #000000; font-weight: bold;'>PENDENTES</div><div style='font-size: 26px; font-weight: bold; color: #D97706; margin-top: 4px;'>{tot_pendentes_f}</div></div>", unsafe_allow_html=True)
         with ck4:
-            st.markdown(f"<div style='background: {t['card_bg']}; border: 1px solid {t['borda']}; border-left: 6px solid #DC2626; padding: 16px; border-radius: 10px;'><div style='font-size: 12px; color: {t['texto']}; font-weight: bold;'>REPROVADOS</div><div style='font-size: 26px; font-weight: bold; color: #DC2626; margin-top: 4px;'>{tot_reprovados_f}</div></div>", unsafe_allow_html=True)
+            st.markdown(f"<div style='background: {t['card_bg']}; border: 1px solid {t['borda']}; border-left: 6px solid #DC2626; padding: 16px; border-radius: 10px;'><div style='font-size: 12px; color: #000000; font-weight: bold;'>REPROVADOS</div><div style='font-size: 26px; font-weight: bold; color: #DC2626; margin-top: 4px;'>{tot_reprovados_f}</div></div>", unsafe_allow_html=True)
 
         st.markdown("<br>", unsafe_allow_html=True)
         col_esq, col_dir = st.columns(2)
 
         with col_esq:
-            st.markdown(f"<h3 style='color:{t['secundario']}; margin-bottom:12px;'>Desempenho de Metas — {nome_curto.upper()}</h3>", unsafe_allow_html=True)
+            st.markdown(f"<h3 style='color:#000000; margin-bottom:12px;'>Desempenho de Metas — {nome_curto.upper()}</h3>", unsafe_allow_html=True)
             dados_tabela_filial = []
             for it in TODOS_ITENS:
                 meta_it = int(metas_f.get(it, 0))
@@ -827,7 +836,7 @@ if df is not None and not df.empty:
                 perc_ap_pe = (float(soma_ap_pe) / float(meta_it) * 100.0) if meta_it > 0 else 0.0
                 perc_ap = (float(ap) / float(meta_it) * 100.0) if meta_it > 0 else 0.0
 
-                barras_html = f"<div style='text-align: left; font-size: 11px; color:{t['texto']}; font-weight:bold; margin-bottom: 2px;'>Apr+Pend ({perc_ap_pe:.1f}%)</div>{renderizar_barra(perc_ap_pe, '#D97706')}<div style='text-align: left; font-size: 11px; color:{t['texto']}; font-weight:bold; margin-top: 4px; margin-bottom: 2px;'>Aprovados ({perc_ap:.1f}%)</div>{renderizar_barra(perc_ap, '#16A34A')}"
+                barras_html = f"<div style='text-align: left; font-size: 11px; color:#000000; font-weight:bold; margin-bottom: 2px;'>Apr+Pend ({perc_ap_pe:.1f}%)</div>{renderizar_barra(perc_ap_pe, '#D97706')}<div style='text-align: left; font-size: 11px; color:#000000; font-weight:bold; margin-top: 4px; margin-bottom: 2px;'>Aprovados ({perc_ap:.1f}%)</div>{renderizar_barra(perc_ap, '#16A34A')}"
                 dados_tabela_filial.append({
                     "Item / Ações": f"<b>{it}</b>",
                     "Meta": f"<b>{meta_it}</b>",
@@ -838,26 +847,26 @@ if df is not None and not df.empty:
                     "Progresso": barras_html,
                 })
             df_tab = pd.DataFrame(dados_tabela_filial)
-            html_table = f'<table style="width:100%; text-align:center; border-collapse: collapse; border: 1px solid {t["borda"]}; color: {t["texto"]}; background-color: {t["card_bg"]}; font-size: 13px;">'
+            html_table = f'<table style="width:100%; text-align:center; border-collapse: collapse; border: 1px solid {t["borda"]}; color: #000000; background-color: {t["card_bg"]}; font-size: 13px;">'
             html_table += f'<tr style="background-color: {t["secundario"]}; color: white;">'
             for col_n in ["Item / Ações", "Meta", "Aprovado", "Pendente", "SOMANDO APROVADO E PENDENTES", "Falta", "Progresso"]:
                 html_table += f'<th style="text-align:center; padding: 10px; border: 1px solid {t["borda"]}; color: white !important;">{col_n}</th>'
             html_table += "</tr>"
             for _, r in df_tab.iterrows():
                 html_table += f'<tr style="background-color: {t["card_bg"]};">'
-                html_table += f'<td style="text-align:center; padding: 10px; border: 1px solid {t["borda"]};">{r["Item / Ações"]}</td>'
-                html_table += f'<td style="text-align:center; padding: 10px; border: 1px solid {t["borda"]};">{r["Meta"]}</td>'
-                html_table += f'<td style="text-align:center; padding: 10px; border: 1px solid {t["borda"]};">{r["Aprovado"]}</td>'
-                html_table += f'<td style="text-align:center; padding: 10px; border: 1px solid {t["borda"]};">{r["Pendente"]}</td>'
-                html_table += f'<td style="text-align:center; padding: 10px; border: 1px solid {t["borda"]};">{r["SOMANDO APROVADO E PENDENTES"]}</td>'
-                html_table += f'<td style="text-align:center; padding: 10px; border: 1px solid {t["borda"]};">{r["Falta"]}</td>'
-                html_table += f'<td style="text-align:center; padding: 10px; border: 1px solid {t["borda"]};">{r["Progresso"]}</td>'
+                html_table += f'<td style="text-align:center; padding: 10px; border: 1px solid {t["borda"]}; color: #000000;">{r["Item / Ações"]}</td>'
+                html_table += f'<td style="text-align:center; padding: 10px; border: 1px solid {t["borda"]}; color: #000000;">{r["Meta"]}</td>'
+                html_table += f'<td style="text-align:center; padding: 10px; border: 1px solid {t["borda"]}; color: #000000;">{r["Aprovado"]}</td>'
+                html_table += f'<td style="text-align:center; padding: 10px; border: 1px solid {t["borda"]}; color: #000000;">{r["Pendente"]}</td>'
+                html_table += f'<td style="text-align:center; padding: 10px; border: 1px solid {t["borda"]}; color: #000000;">{r["SOMANDO APROVADO E PENDENTES"]}</td>'
+                html_table += f'<td style="text-align:center; padding: 10px; border: 1px solid {t["borda"]}; color: #000000;">{r["Falta"]}</td>'
+                html_table += f'<td style="text-align:center; padding: 10px; border: 1px solid {t["borda"]}; color: #000000;">{r["Progresso"]}</td>'
                 html_table += "</tr>"
             html_table += "</table>"
             st.markdown(html_table, unsafe_allow_html=True)
 
         with col_dir:
-            st.markdown(f"<h3 style='color:{t['secundario']}; margin-bottom:12px;'>Acompanhamento Diário (Hoje)</h3>", unsafe_allow_html=True)
+            st.markdown(f"<h3 style='color:#000000; margin-bottom:12px;'>Acompanhamento Diário (Hoje)</h3>", unsafe_allow_html=True)
             hoje = date.today()
             df_hoje = df_f[df_f["Data_Calc"] == hoje]
             todos_promotores_filial = sorted(df_f[col_promotor].dropna().unique().tolist())
@@ -887,7 +896,7 @@ if df is not None and not df.empty:
 
                     with cols_promotores[i % len(cols_promotores)]:
                         st.markdown(
-                            f"<div style='background-color: {t['card_bg']}; border: 1px solid {t['borda']}; border-top: 5px solid {cor_borda}; padding: 12px 8px; border-radius: 8px; text-align: center;'><img src='{src_img}' style='width: 75px; height: 75px; border-radius: 50%; object-fit: cover; border: 2px solid {cor_borda}; margin-bottom: 6px;'><div style='font-size: 13px; font-weight: bold;'>{nome_curto_prom}</div><div style='font-size: 11px; font-weight: bold; color: {cor_borda};'>{row['Leituras Hoje']} leituras</div></div>",
+                            f"<div style='background-color: {t['card_bg']}; border: 1px solid {t['borda']}; border-top: 5px solid {cor_borda}; padding: 12px 8px; border-radius: 8px; text-align: center;'><img src='{src_img}' style='width: 75px; height: 75px; border-radius: 50%; object-fit: cover; border: 2px solid {cor_borda}; margin-bottom: 6px;'><div style='font-size: 13px; font-weight: bold; color: #000000;'>{nome_curto_prom}</div><div style='font-size: 11px; font-weight: bold; color: {cor_borda};'>{row['Leituras Hoje']} leituras</div></div>",
                             unsafe_allow_html=True,
                         )
 
@@ -967,16 +976,16 @@ if df is not None and not df.empty:
                             src_img = f"data:image/png;base64,{img_b64}"
                         else:
                             src_img = foto_prom
-                        st.markdown(f"<div style='display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;'><img src='{src_img}' style='width: 90px; height: 90px; border-radius: 8px; object-fit: cover; border: 1px solid {t['borda']}; margin-bottom: 6px;'><div style='font-size: 14px; font-weight: bold;'>{prom}</div></div>", unsafe_allow_html=True)
+                        st.markdown(f"<div style='display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;'><img src='{src_img}' style='width: 90px; height: 90px; border-radius: 8px; object-fit: cover; border: 1px solid {t['borda']}; margin-bottom: 6px;'><div style='font-size: 14px; font-weight: bold; color: #000000;'>{prom}</div></div>", unsafe_allow_html=True)
                     with c_detalhes:
                         st.markdown(
-                            f"<div style='display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 10px;'><div style='background-color: {t['bg_app']}; border: 1px solid {t['borda']}; padding: 8px 12px; border-radius: 8px; text-align: center;'><div style='font-size: 11px; font-weight: bold;'>TOTAL</div><div style='font-size: 16px; color: {t['secundario']}; font-weight: 800;'>{total}</div></div><div style='background-color: #F0FDF4; border: 1px solid #DCFCE7; padding: 8px 12px; border-radius: 8px; text-align: center;'><div style='font-size: 11px; color: #166534; font-weight: bold;'>APROVADOS</div><div style='font-size: 16px; color: #16A34A; font-weight: 800;'>{aprovados}</div></div><div style='background-color: #FEF3C7; border: 1px solid #FDE68A; padding: 8px 12px; border-radius: 8px; text-align: center;'><div style='font-size: 11px; color: #92400E; font-weight: bold;'>APV + PEND</div><div style='font-size: 16px; color: #D97706; font-weight: 800;'>{apv_pend}</div></div><div style='background-color: #FEFCE8; border: 1px solid #FEF08A; padding: 8px 12px; border-radius: 8px; text-align: center;'><div style='font-size: 11px; color: #854D0E; font-weight: bold;'>CANCELADOS</div><div style='font-size: 16px; color: #CA8A04; font-weight: 800;'>{cancelados}</div></div><div style='background-color: #FEF2F2; border: 1px solid #FEE2E2; padding: 8px 12px; border-radius: 8px; text-align: center;'><div style='font-size: 11px; color: #991B1B; font-weight: bold;'>REPROVADOS</div><div style='font-size: 16px; color: #DC2626; font-weight: 800;'>{reprovados}</div></div></div>",
+                            f"<div style='display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 10px;'><div style='background-color: {t['bg_app']}; border: 1px solid {t['borda']}; padding: 8px 12px; border-radius: 8px; text-align: center;'><div style='font-size: 11px; font-weight: bold; color: #000000;'>TOTAL</div><div style='font-size: 16px; color: {t['secundario']}; font-weight: 800;'>{total}</div></div><div style='background-color: #F0FDF4; border: 1px solid #DCFCE7; padding: 8px 12px; border-radius: 8px; text-align: center;'><div style='font-size: 11px; font-weight: bold; color: #000000;'>APROVADOS</div><div style='font-size: 16px; color: #16A34A; font-weight: 800;'>{aprovados}</div></div><div style='background-color: #FEF3C7; border: 1px solid #FDE68A; padding: 8px 12px; border-radius: 8px; text-align: center;'><div style='font-size: 11px; font-weight: bold; color: #000000;'>APV + PEND</div><div style='font-size: 16px; color: #D97706; font-weight: 800;'>{apv_pend}</div></div><div style='background-color: #FEFCE8; border: 1px solid #FEF08A; padding: 8px 12px; border-radius: 8px; text-align: center;'><div style='font-size: 11px; font-weight: bold; color: #000000;'>CANCELADOS</div><div style='font-size: 16px; color: #CA8A04; font-weight: 800;'>{cancelados}</div></div><div style='background-color: #FEF2F2; border: 1px solid #FEE2E2; padding: 8px 12px; border-radius: 8px; text-align: center;'><div style='font-size: 11px; font-weight: bold; color: #000000;'>REPROVADOS</div><div style='font-size: 16px; color: #DC2626; font-weight: 800;'>{reprovados}</div></div></div>",
                             unsafe_allow_html=True,
                         )
                         contagem_kpi = df_p[col_item].value_counts()
                         badges_rank = "<div style='display: flex; flex-wrap: wrap; gap: 6px;'>"
                         for item_kpi, qtd_kpi in contagem_kpi.items():
-                            badges_rank += f"<span style='background-color: {t['bg_app']}; border: 1px solid {t['borda']}; color: {t['primario']}; padding: 4px 10px; border-radius: 16px; font-size: 12px; font-weight: 600;'><b>{qtd_kpi}x</b> {item_kpi}</span>"
+                            badges_rank += f"<span style='background-color: {t['bg_app']}; border: 1px solid {t['borda']}; color: #000000; padding: 4px 10px; border-radius: 16px; font-size: 12px; font-weight: 600;'><b>{qtd_kpi}x</b> {item_kpi}</span>"
                         badges_rank += "</div>"
                         st.markdown(badges_rank, unsafe_allow_html=True)
                     st.markdown("</div>", unsafe_allow_html=True)
@@ -997,9 +1006,9 @@ if df is not None and not df.empty:
             tabela_rep_geral.columns = ["Filial", "Promotor", "Loja (PDV)", "Item", "Status", "Motivo da Recusa"]
 
             html_rep_geral = tabela_rep_geral.to_html(escape=False, index=False)
-            html_rep_geral = html_rep_geral.replace("<table>", f'<table style="width:100%; text-align:center; border-collapse: collapse; border: 1px solid {t["borda"]}; color: {t["texto"]}; background-color: {t["card_bg"]}; font-size: 13px;">')
+            html_rep_geral = html_rep_geral.replace("<table>", f'<table style="width:100%; text-align:center; border-collapse: collapse; border: 1px solid {t["borda"]}; color: #000000; background-color: {t["card_bg"]}; font-size: 13px;">')
             html_rep_geral = html_rep_geral.replace("<th>", f'<th style="text-align:center; padding: 10px; border: 1px solid {t["borda"]}; background-color: #DC2626; color: white !important; font-size: 13px;">')
-            html_rep_geral = html_rep_geral.replace("<td>", f'<td style="text-align:center; padding: 10px; border: 1px solid {t["borda"]}; vertical-align: middle;">')
+            html_rep_geral = html_rep_geral.replace("<td>", f'<td style="text-align:center; padding: 10px; border: 1px solid {t["borda"]}; vertical-align: middle; color: #000000;">')
             st.markdown(html_rep_geral, unsafe_allow_html=True)
         else:
             st.success("Parabéns! Não há nenhum registro reprovado para os filtros selecionados.")
@@ -1079,10 +1088,10 @@ if df is not None and not df.empty:
                 tot_corrigido = len(df_audit[df_audit["Auditoria"] == "🟡 Preço Corrigido (Cancelado)"])
 
                 ck1, ck2, ck3, ck4 = st.columns(4)
-                ck1.markdown(f"<div style='border-left: 5px solid #16A34A; background:{t['card_bg']}; padding:12px; border-radius:8px; border:1px solid {t['borda']};'><div>Dentro do Preço</div><div style='font-size:20px;font-weight:bold;color:#16A34A'>{tot_dentro}</div></div>", unsafe_allow_html=True)
-                ck2.markdown(f"<div style='border-left: 5px solid #10B981; background:{t['card_bg']}; padding:12px; border-radius:8px; border:1px solid {t['borda']};'><div>Mais Barato (Apr.)</div><div style='font-size:20px;font-weight:bold;color:#10B981'>{tot_barato}</div></div>", unsafe_allow_html=True)
-                ck3.markdown(f"<div style='border-left: 5px solid #DC2626; background:{t['card_bg']}; padding:12px; border-radius:8px; border:1px solid {t['borda']};'><div>Acima do Range</div><div style='font-size:20px;font-weight:bold;color:#DC2626'>{tot_fora}</div></div>", unsafe_allow_html=True)
-                ck4.markdown(f"<div style='border-left: 5px solid #EAB308; background:{t['card_bg']}; padding:12px; border-radius:8px; border:1px solid {t['borda']};'><div>Cancelados</div><div style='font-size:20px;font-weight:bold;color:#EAB308'>{tot_corrigido}</div></div>", unsafe_allow_html=True)
+                ck1.markdown(f"<div style='border-left: 5px solid #16A34A; background:{t['card_bg']}; padding:12px; border-radius:8px; border:1px solid {t['borda']};'><div style='color:#000000;'>Dentro do Preço</div><div style='font-size:20px;font-weight:bold;color:#16A34A'>{tot_dentro}</div></div>", unsafe_allow_html=True)
+                ck2.markdown(f"<div style='border-left: 5px solid #10B981; background:{t['card_bg']}; padding:12px; border-radius:8px; border:1px solid {t['borda']};'><div style='color:#000000;'>Mais Barato (Apr.)</div><div style='font-size:20px;font-weight:bold;color:#10B981'>{tot_barato}</div></div>", unsafe_allow_html=True)
+                ck3.markdown(f"<div style='border-left: 5px solid #DC2626; background:{t['card_bg']}; padding:12px; border-radius:8px; border:1px solid {t['borda']};'><div style='color:#000000;'>Acima do Range</div><div style='font-size:20px;font-weight:bold;color:#DC2626'>{tot_fora}</div></div>", unsafe_allow_html=True)
+                ck4.markdown(f"<div style='border-left: 5px solid #EAB308; background:{t['card_bg']}; padding:12px; border-radius:8px; border:1px solid {t['borda']};'><div style='color:#000000;'>Cancelados</div><div style='font-size:20px;font-weight:bold;color:#EAB308'>{tot_corrigido}</div></div>", unsafe_allow_html=True)
 
                 st.markdown("<br>### Detalhamento da Análise de Preços", unsafe_allow_html=True)
                 filtro_auditoria = st.selectbox(
@@ -1111,9 +1120,9 @@ if df is not None and not df.empty:
                     tabela_div = df_tabela[[col_promotor, "Cidade", "Pdv", "Produto_Preco", col_preco, "Auditoria"]]
                     tabela_div.columns = ["Promotor", "Cidade", "Loja", "Produto", "Preço Digitado (R$)", "Status do Preço"]
                     html_div = tabela_div.to_html(escape=False, index=False)
-                    html_div = html_div.replace("<table>", f'<table style="width:100%; text-align:center; border-collapse: collapse; border: 1px solid {t["borda"]}; color: {t["texto"]}; background-color: {t["card_bg"]}; font-size: 13px;">')
+                    html_div = html_div.replace("<table>", f'<table style="width:100%; text-align:center; border-collapse: collapse; border: 1px solid {t["borda"]}; color: #000000; background-color: {t["card_bg"]}; font-size: 13px;">')
                     html_div = html_div.replace("<th>", f'<th style="text-align:center; padding: 10px; border: 1px solid {t["borda"]}; background-color: {t["secundario"]}; color: white !important; font-size: 13px;">')
-                    html_div = html_div.replace("<td>", f'<td style="text-align:center; padding: 10px; border: 1px solid {t["borda"]}; vertical-align: middle;">')
+                    html_div = html_div.replace("<td>", f'<td style="text-align:center; padding: 10px; border: 1px solid {t["borda"]}; vertical-align: middle; color: #000000;">')
                     st.markdown(html_div, unsafe_allow_html=True)
                 else:
                     st.success("Nenhum dado encontrado para este filtro.")
@@ -1137,9 +1146,9 @@ if df is not None and not df.empty:
                 tabela_outros = df_sem_controle[[col_promotor, "Cidade", "Pdv", "Produto_Preco", col_preco]]
                 tabela_outros.columns = ["Promotor", "Cidade", "Loja", "Produto", "Leitura Digitada"]
                 html_outros = tabela_outros.to_html(escape=False, index=False)
-                html_outros = html_outros.replace("<table>", f'<table style="width:100%; text-align:center; border-collapse: collapse; border: 1px solid {t["borda"]}; color: {t["texto"]}; background-color: {t["card_bg"]}; font-size: 13px;">')
+                html_outros = html_outros.replace("<table>", f'<table style="width:100%; text-align:center; border-collapse: collapse; border: 1px solid {t["borda"]}; color: #000000; background-color: {t["card_bg"]}; font-size: 13px;">')
                 html_outros = html_outros.replace("<th>", f'<th style="text-align:center; padding: 10px; border: 1px solid {t["borda"]}; background-color: {t["secundario"]}; color: white !important; font-size: 13px;">')
-                html_outros = html_outros.replace("<td>", f'<td style="text-align:center; padding: 10px; border: 1px solid {t["borda"]}; vertical-align: middle;">')
+                html_outros = html_outros.replace("<td>", f'<td style="text-align:center; padding: 10px; border: 1px solid {t["borda"]}; vertical-align: middle; color: #000000;">')
                 st.markdown(html_outros, unsafe_allow_html=True)
             else:
                 st.success("Não há itens sem controle para exibir.")
@@ -1184,11 +1193,11 @@ if df is not None and not df.empty:
                         if img_prod:
                             st.image(img_prod, width=50)
                         else:
-                            st.markdown("<div style='font-size:11px; color:#94A3B8; text-align:center; padding-top:10px;'>Sem foto</div>", unsafe_allow_html=True)
+                            st.markdown("<div style='font-size:11px; color:#000000; text-align:center; padding-top:10px;'>Sem foto</div>", unsafe_allow_html=True)
                     with col_info:
-                        st.markdown(f"<div style='font-size: 15px; font-weight: bold; color: {t['secundario']}; padding-top: 12px;'>#{pos} - {prod_nome_exibicao}</div>", unsafe_allow_html=True)
+                        st.markdown(f"<div style='font-size: 15px; font-weight: bold; color: #000000; padding-top: 12px;'>#{pos} - {prod_nome_exibicao}</div>", unsafe_allow_html=True)
                     with col_qtd:
-                        st.markdown(f"<div style='font-size: 16px; font-weight: 800; color: {t['texto']}; text-align: right; padding-top: 12px;'>{qtd} leituras</div>", unsafe_allow_html=True)
+                        st.markdown(f"<div style='font-size: 16px; font-weight: 800; color: #000000; text-align: right; padding-top: 12px;'>{qtd} leituras</div>", unsafe_allow_html=True)
                     st.markdown(f"<hr style='margin: 4px 0; border-color: {t['borda']};'>", unsafe_allow_html=True)
         else:
             st.warning("Nenhum dado encontrado para os filtros selecionados.")
@@ -1196,6 +1205,6 @@ if df is not None and not df.empty:
 # --- ASSINATURA DISCRETA NO RODAPÉ ---
 st.markdown("---")
 st.markdown(
-    f"<div style='text-align: center; font-size: 12px; color: {t['texto']}; opacity: 0.7; margin-bottom: 20px;'>Desenvolvido por Benedito Bandola</div>",
+    f"<div style='text-align: center; font-size: 12px; color: #000000; opacity: 0.7; margin-bottom: 20px;'>Desenvolvido por Benedito Bandola</div>",
     unsafe_allow_html=True,
 )
