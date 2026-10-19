@@ -1,0 +1,10 @@
+streamlit
+pandas
+openpyxl
+folium
+streamlit-folium
+plotly
+fpdf2
+Pillow
+playwright
+requests
