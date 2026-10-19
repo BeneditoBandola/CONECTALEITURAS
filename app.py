@@ -64,7 +64,6 @@ def obter_datas_periodo(nome_periodo):
 def baixar_planilha_pdvpet(periodo_escolhido="P11"):
     data_de_str, data_ate_str = obter_datas_periodo(periodo_escolhido)
     
-    # Garante que o navegador do Playwright está instalado no ambiente cloud
     try:
         subprocess.run([sys.executable, "-m", "playwright", "install", "chromium"], capture_output=True, text=True)
     except Exception:
@@ -1054,8 +1053,11 @@ if df is not None and not df.empty:
 
     elif pagina_selecionada == "🏆 Ranking de Leituras":
         st.markdown(f"## Ranking Geral de Leituras da Equipe — {periodo_atual}")
+        st.write("Acompanhamento competitivo de todos os promotores para o período selecionado.")
+
         filial_rank_sel = st.selectbox("Filial para Filtrar Ranking:", ["TODAS"] + FILIAIS)
         df_rank = df[df[col_item].isin(TODOS_ITENS)].copy()
+
         if filial_rank_sel != "TODAS":
             df_rank = filtrar_por_filial(df_rank, filial_rank_sel, col_filial)
 
@@ -1078,27 +1080,476 @@ if df is not None and not df.empty:
                     "reprovados": total_reprovados,
                     "df_promotor": df_p,
                 })
+
             lista_ranking = sorted(lista_ranking, key=lambda x: x["total"], reverse=True)
+
+            def gerar_pdf_ranking(dados_ranking, filial_nome, df_geral):
+                class PDFRelatorio(FPDF):
+                    def footer(self):
+                        self.set_y(-10)
+                        self.set_font("Helvetica", "I", 8)
+                        self.set_text_color(100, 116, 139)
+                        self.cell(0, 5, "Desenvolvido por Benedito Bandola", 0, 0, "C")
+
+                pdf = PDFRelatorio(orientation="L", unit="mm", format="A4")
+                pdf.set_auto_page_break(auto=True, margin=15)
+                pdf.add_page()
+                pdf.set_font("Helvetica", "B", 16)
+                pdf.set_text_color(30, 58, 138)
+                pdf.cell(0, 8, f"Leituras Minassal - {periodo_atual}", ln=True, align="C")
+
+                pdf.set_font("Helvetica", "I", 9)
+                pdf.set_text_color(100, 116, 139)
+                pdf.cell(0, 5, f"Filtro: {filial_nome} | Emissão: {datetime.now().strftime('%d/%m/%Y %H:%M')}", ln=True, align="C")
+                pdf.ln(3)
+
+                pdf.set_draw_color(203, 213, 225)
+                pdf.set_line_width(0.5)
+                pdf.line(10, pdf.get_y(), 287, pdf.get_y())
+                pdf.ln(3)
+
+                pdf.set_fill_color(30, 58, 138)
+                pdf.set_text_color(255, 255, 255)
+                pdf.set_font("Helvetica", "B", 9)
+                pdf.rect(10, pdf.get_y(), 277, 7, style="F")
+
+                pdf.set_xy(12, pdf.get_y() + 1)
+                pdf.cell(113, 5, "PROMOTOR / FILIAL", 0, 0, "L")
+                pdf.cell(28, 5, "TOTAL", 0, 0, "C")
+                pdf.cell(32, 5, "APROVADOS", 0, 0, "C")
+                pdf.cell(32, 5, "APV + PENDENTES", 0, 0, "C")
+                pdf.cell(32, 5, "CANCELADOS", 0, 0, "C")
+                pdf.cell(30, 5, "REPROVADOS", 0, 1, "C")
+                pdf.ln(2)
+
+                temp_files_to_delete = []
+                rgb_filiais = {
+                    "Pocos de Caldas": (240, 253, 244),
+                    "Sao Joao da Boa Vista": (253, 242, 248),
+                    "Sao Jose do Rio Preto": (239, 246, 255),
+                    "Juiz de Fora": (254, 252, 232),
+                }
+
+                for idx, item in enumerate(dados_ranking, start=1):
+                    y_inicial = pdf.get_y()
+                    df_p_item = item["df_promotor"]
+                    filial_promotor_str = "N/A"
+                    if not df_p_item.empty and col_filial in df_p_item.columns:
+                        val_filial_bruto = str(df_p_item[col_filial].iloc[0])
+                        filial_promotor_str = val_filial_bruto.split("-")[-1].strip()
+
+                    if filial_promotor_str.upper() == "MINASSAL LTDA":
+                        filial_promotor_str = "MINASSAL SAO JOAO DA BOA VISTA"
+
+                    cor_rgb_fundo = (255, 255, 255)
+                    for chave_f, rgb_val in rgb_filiais.items():
+                        if chave_f.lower() in filial_promotor_str.lower():
+                            cor_rgb_fundo = rgb_val
+                            break
+
+                    pdf.set_fill_color(cor_rgb_fundo[0], cor_rgb_fundo[1], cor_rgb_fundo[2])
+                    pdf.set_draw_color(203, 213, 225)
+                    pdf.set_line_width(0.3)
+                    pdf.rect(10, y_inicial, 277, 21, style="DF")
+
+                    foto_obj = obter_foto_promotor(item["promotor"])
+                    if isinstance(foto_obj, Image.Image):
+                        try:
+                            if foto_obj.mode in ("RGBA", "P"):
+                                foto_obj = foto_obj.convert("RGB")
+                            temp_img = tempfile.NamedTemporaryFile(delete=False, suffix=".png")
+                            foto_obj.save(temp_img, format="PNG")
+                            temp_img.close()
+                            temp_files_to_delete.append(temp_img.name)
+                            pdf.image(temp_img.name, x=14, y=y_inicial + 3.5, w=14, h=14)
+                        except:
+                            pass
+
+                    pdf.set_xy(34, y_inicial + 3)
+                    pdf.set_font("Helvetica", "B", 10)
+                    pdf.set_text_color(15, 23, 42)
+                    pdf.cell(88, 5, f"#{idx} - {item['promotor']}", ln=0)
+
+                    pdf.set_xy(34, y_inicial + 11.5)
+                    pdf.set_font("Helvetica", "I", 8.5)
+                    pdf.set_text_color(71, 85, 105)
+                    pdf.cell(88, 4, f"Filial: {filial_promotor_str}", ln=0)
+
+                    pdf.set_xy(125, y_inicial + 6)
+                    pdf.set_font("Helvetica", "B", 10)
+                    pdf.set_text_color(30, 58, 138)
+                    pdf.cell(28, 6, str(item["total"]), 0, 0, "C")
+                    pdf.set_text_color(22, 163, 74)
+                    pdf.cell(32, 6, str(item["aprovados"]), 0, 0, "C")
+                    pdf.set_text_color(217, 119, 6)
+                    pdf.cell(32, 6, str(item["apv_pend"]), 0, 0, "C")
+                    pdf.set_text_color(202, 138, 4)
+                    pdf.cell(32, 6, str(item["cancelados"]), 0, 0, "C")
+                    pdf.set_text_color(220, 38, 38)
+                    pdf.cell(30, 6, str(item["reprovados"]), 0, 1, "C")
+                    pdf.ln(4)
+
+                return pdf.output(dest="S").encode("latin1", errors="replace")
+
+            pdf_bytes = gerar_pdf_ranking(lista_ranking, filial_rank_sel, df)
+            st.download_button(
+                label="Baixar Relatório em PDF Executivo (Ranking + Metas)",
+                data=pdf_bytes,
+                file_name=f"Ranking_Metas_{periodo_atual}_{filial_rank_sel.replace(' ', '_')}.pdf",
+                mime="application/pdf",
+                use_container_width=True,
+            )
+            st.markdown("<br>", unsafe_allow_html=True)
 
             for posicao, item_rank in enumerate(lista_ranking, start=1):
                 prom = item_rank["promotor"]
                 total = item_rank["total"]
                 aprovados = item_rank["aprovados"]
                 apv_pend = item_rank["apv_pend"]
+                cancelados = item_rank["cancelados"]
                 reprovados = item_rank["reprovados"]
+                df_p = item_rank["df_promotor"]
                 foto_prom = obter_foto_promotor(prom)
-                if isinstance(foto_prom, Image.Image):
-                    buffered = BytesIO()
-                    foto_prom.save(buffered, format="PNG")
-                    img_b64 = base64.b64encode(buffered.getvalue()).decode("utf-8")
-                    src_img = f"data:image/png;base64,{img_b64}"
-                else:
-                    src_img = foto_prom
 
-                st.markdown(
-                    f"<div style='background-color: {t['card_bg']}; border: 1px solid {t['borda']}; padding: 18px; border-radius: 12px; margin-bottom: 16px;'><b>#{posicao} - {prom}</b> | Total: {total} | Aprovados: {aprovados} | Reprovados: {reprovados}</div>",
-                    unsafe_allow_html=True,
+                cor_medalha = "#94A3B8"
+                if posicao == 1:
+                    cor_medalha = "#F59E0B"
+                elif posicao == 2:
+                    cor_medalha = "#64748B"
+                elif posicao == 3:
+                    cor_medalha = "#B45309"
+
+                with st.container():
+                    st.markdown(
+                        f"<div style='background-color: {t['card_bg']}; border: 1px solid {t['borda']}; border-left: 8px solid {cor_medalha}; padding: 18px; border-radius: 12px; margin-bottom: 16px;'>",
+                        unsafe_allow_html=True,
+                    )
+                    c_pos, c_img, c_detalhes = st.columns([1, 2.5, 6])
+                    with c_pos:
+                        st.markdown(f"<div style='font-size: 28px; font-weight: 800; color: {cor_medalha}; text-align: center; padding-top: 35px;'>#{posicao}</div>", unsafe_allow_html=True)
+                    with c_img:
+                        if isinstance(foto_prom, Image.Image):
+                            buffered = BytesIO()
+                            foto_prom.save(buffered, format="PNG")
+                            img_b64 = base64.b64encode(buffered.getvalue()).decode("utf-8")
+                            src_img = f"data:image/png;base64,{img_b64}"
+                        else:
+                            src_img = foto_prom
+                        st.markdown(f"<div style='display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;'><img src='{src_img}' style='width: 90px; height: 90px; border-radius: 8px; object-fit: cover; border: 1px solid {t['borda']}; margin-bottom: 6px;'><div style='font-size: 14px; font-weight: bold;'>{prom}</div></div>", unsafe_allow_html=True)
+                    with c_detalhes:
+                        st.markdown(
+                            f"<div style='display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 10px;'><div style='background-color: {t['bg_app']}; border: 1px solid {t['borda']}; padding: 8px 12px; border-radius: 8px; text-align: center;'><div style='font-size: 11px; font-weight: bold;'>TOTAL</div><div style='font-size: 16px; color: {t['secundario']}; font-weight: 800;'>{total}</div></div><div style='background-color: #F0FDF4; border: 1px solid #DCFCE7; padding: 8px 12px; border-radius: 8px; text-align: center;'><div style='font-size: 11px; color: #166534; font-weight: bold;'>APROVADOS</div><div style='font-size: 16px; color: #16A34A; font-weight: 800;'>{aprovados}</div></div><div style='background-color: #FEF3C7; border: 1px solid #FDE68A; padding: 8px 12px; border-radius: 8px; text-align: center;'><div style='font-size: 11px; color: #92400E; font-weight: bold;'>APV + PEND</div><div style='font-size: 16px; color: #D97706; font-weight: 800;'>{apv_pend}</div></div><div style='background-color: #FEFCE8; border: 1px solid #FEF08A; padding: 8px 12px; border-radius: 8px; text-align: center;'><div style='font-size: 11px; color: #854D0E; font-weight: bold;'>CANCELADOS</div><div style='font-size: 16px; color: #CA8A04; font-weight: 800;'>{cancelados}</div></div><div style='background-color: #FEF2F2; border: 1px solid #FEE2E2; padding: 8px 12px; border-radius: 8px; text-align: center;'><div style='font-size: 11px; color: #991B1B; font-weight: bold;'>REPROVADOS</div><div style='font-size: 16px; color: #DC2626; font-weight: 800;'>{reprovados}</div></div></div>",
+                            unsafe_allow_html=True,
+                        )
+                        contagem_kpi = df_p[col_item].value_counts()
+                        badges_rank = "<div style='display: flex; flex-wrap: wrap; gap: 6px;'>"
+                        for item_kpi, qtd_kpi in contagem_kpi.items():
+                            badges_rank += f"<span style='background-color: {t['bg_app']}; border: 1px solid {t['borda']}; color: {t['primario']}; padding: 4px 10px; border-radius: 16px; font-size: 12px; font-weight: 600;'><b>{qtd_kpi}x</b> {item_kpi}</span>"
+                        badges_rank += "</div>"
+                        st.markdown(badges_rank, unsafe_allow_html=True)
+                    st.markdown("</div>", unsafe_allow_html=True)
+        else:
+            st.info("Nenhum dado encontrado para o ranking.")
+
+    elif pagina_selecionada == "🚨 Registros Reprovados":
+        st.markdown(f"## Central Exclusiva de Registros Reprovados — {periodo_atual}")
+        filial_rep_sel = st.selectbox("Filial:", ["TODAS"] + FILIAIS)
+        df_reprovados_geral = df[df[col_status].str.contains("Reprovado|Não|Nao|Recusado", case=False, na=False)].copy()
+
+        if filial_rep_sel != "TODAS":
+            df_reprovados_geral = filtrar_por_filial(df_reprovados_geral, filial_rep_sel, col_filial)
+
+        if not df_reprovados_geral.empty:
+            col_justif = "JustificativaRecusa" if "JustificativaRecusa" in df_reprovados_geral.columns else col_status
+            tabela_rep_geral = df_reprovados_geral[[col_filial, col_promotor, "Pdv", col_item, col_status, col_justif]]
+            tabela_rep_geral.columns = ["Filial", "Promotor", "Loja (PDV)", "Item", "Status", "Motivo da Recusa"]
+
+            html_rep_geral = tabela_rep_geral.to_html(escape=False, index=False)
+            html_rep_geral = html_rep_geral.replace("<table>", f'<table style="width:100%; text-align:center; border-collapse: collapse; border: 1px solid {t["borda"]}; color: {t["texto"]}; background-color: {t["card_bg"]}; font-size: 13px;">')
+            html_rep_geral = html_rep_geral.replace("<th>", f'<th style="text-align:center; padding: 10px; border: 1px solid {t["borda"]}; background-color: #DC2626; color: white !important; font-size: 13px;">')
+            html_rep_geral = html_rep_geral.replace("<td>", f'<td style="text-align:center; padding: 10px; border: 1px solid {t["borda"]}; vertical-align: middle;">')
+            st.markdown(html_rep_geral, unsafe_allow_html=True)
+        else:
+            st.success("Parabéns! Não há nenhum registro reprovado para os filtros selecionados.")
+
+    elif pagina_selecionada == "💰 Auditoria de Preços":
+        st.markdown(f"## Auditoria e Análise de Preços no PDV — {periodo_atual}")
+        precos_dict = carregar_precos()
+
+        tipo_visao_preco = st.radio(
+            "Selecione a Visão da Auditoria:",
+            [
+                "🔍 Itens com Preço Controlado (Auditoria de Small Bags)",
+                "📋 Demais Itens (Sem Controle de Preço na Planilha)",
+            ],
+            horizontal=True,
+        )
+
+        if tipo_visao_preco == "🔍 Itens com Preço Controlado (Auditoria de Small Bags)":
+            with st.expander("Gerenciar Regras de Preços (Small Bags)", expanded=True):
+                df_regras = pd.DataFrame([
+                    {
+                        "Produto": k,
+                        "Mínimo (R$)": float(v.get("min", 0.0)),
+                        "Máximo (R$)": float(v.get("max", 0.0)),
+                        "Não Participante": v.get("nao_participante", False),
+                        "Excluir": False,
+                    }
+                    for k, v in precos_dict.items()
+                ])
+
+                df_editado = st.data_editor(
+                    df_regras,
+                    column_config={
+                        "Produto": st.column_config.TextColumn("Produto", disabled=True),
+                        "Mínimo (R$)": st.column_config.NumberColumn("Mínimo (R$)", format="%.2f", step=0.1),
+                        "Máximo (R$)": st.column_config.NumberColumn("Máximo (R$)", format="%.2f", step=0.1),
+                        "Não Participante": st.column_config.CheckboxColumn("Não Participante"),
+                        "Excluir": st.column_config.CheckboxColumn("Excluir"),
+                    },
+                    hide_index=True,
+                    use_container_width=True,
                 )
+
+                if st.button("Salvar Alterações na Tabela", type="primary", key="btn_salvar_regras"):
+                    novas_regras = {}
+                    for _, row in df_editado.iterrows():
+                        if not row["Excluir"]:
+                            novas_regras[row["Produto"]] = {
+                                "min": row["Mínimo (R$)"],
+                                "max": row["Máximo (R$)"],
+                                "nao_participante": row["Não Participante"],
+                            }
+                    salvar_precos(novas_regras)
+                    st.success("Alterações de preços salvas com sucesso!")
+                    time.sleep(0.5)
+                    st.rerun()
+
+            st.markdown("---")
+            f1, f2 = st.columns(2)
+            with f1:
+                filial_audit = st.selectbox("Filial:", ["TODAS"] + FILIAIS, key="fil_audit")
+            with f2:
+                promotores_audit = ["TODOS"] + sorted(df[col_promotor].dropna().unique().tolist())
+                prom_audit = st.selectbox("Promotor:", promotores_audit, key="prom_audit")
+
+            df_audit = df[df["Produto_Preco"].isin(precos_dict.keys())].copy()
+            if filial_audit != "TODAS":
+                df_audit = filtrar_por_filial(df_audit, filial_audit, col_filial)
+            if prom_audit != "TODOS":
+                df_audit = df_audit[df_audit[col_promotor] == prom_audit]
+
+            if not df_audit.empty:
+                df_audit["Auditoria"] = df_audit["Auditoria_Preco"]
+                tot_dentro = len(df_audit[df_audit["Auditoria"].isin(["🟢 Dentro da Faixa", "🟢 Mais Barato (Aprovado)"])])
+                tot_barato = len(df_audit[df_audit["Auditoria"] == "🟢 Mais Barato (Aprovado)"])
+                tot_fora = len(df_audit[df_audit["Auditoria"] == "🔴 Fora (Acima do Teto)"])
+                tot_corrigido = len(df_audit[df_audit["Auditoria"] == "🟡 Preço Corrigido (Cancelado)"])
+
+                ck1, ck2, ck3, ck4 = st.columns(4)
+                ck1.markdown(f"<div style='border-left: 5px solid #16A34A; background:{t['card_bg']}; padding:12px; border-radius:8px; border:1px solid {t['borda']};'><div>Dentro do Preço</div><div style='font-size:20px;font-weight:bold;color:#16A34A'>{tot_dentro}</div></div>", unsafe_allow_html=True)
+                ck2.markdown(f"<div style='border-left: 5px solid #10B981; background:{t['card_bg']}; padding:12px; border-radius:8px; border:1px solid {t['borda']};'><div>Mais Barato (Apr.)</div><div style='font-size:20px;font-weight:bold;color:#10B981'>{tot_barato}</div></div>", unsafe_allow_html=True)
+                ck3.markdown(f"<div style='border-left: 5px solid #DC2626; background:{t['card_bg']}; padding:12px; border-radius:8px; border:1px solid {t['borda']};'><div>Acima do Range</div><div style='font-size:20px;font-weight:bold;color:#DC2626'>{tot_fora}</div></div>", unsafe_allow_html=True)
+                ck4.markdown(f"<div style='border-left: 5px solid #EAB308; background:{t['card_bg']}; padding:12px; border-radius:8px; border:1px solid {t['borda']};'><div>Cancelados</div><div style='font-size:20px;font-weight:bold;color:#EAB308'>{tot_corrigido}</div></div>", unsafe_allow_html=True)
+
+                st.markdown("<br>### Detalhamento da Análise de Preços", unsafe_allow_html=True)
+                filtro_auditoria = st.selectbox(
+                    "Filtrar Tabela por Condição:",
+                    [
+                        "⚠️ Divergências e Ressalvas (Padrão)",
+                        "🔴 Apenas Acima do Range",
+                        "🟡 Apenas Preços Cancelados",
+                        "🟢 Apenas Mais Barato",
+                        "📋 Mostrar Tudo",
+                    ],
+                )
+
+                if filtro_auditoria == "⚠️ Divergências e Ressalvas (Padrão)":
+                    df_tabela = df_audit[df_audit["Auditoria"].isin(["🔴 Fora (Acima do Teto)", "🟢 Mais Barato (Aprovado)", "🟡 Preço Corrigido (Cancelado)"])].copy()
+                elif "Acima do Range" in filtro_auditoria:
+                    df_tabela = df_audit[df_audit["Auditoria"] == "🔴 Fora (Acima do Teto)"].copy()
+                elif "Cancelados" in filtro_auditoria:
+                    df_tabela = df_audit[df_audit["Auditoria"] == "🟡 Preço Corrigido (Cancelado)"].copy()
+                elif "Mais Barato" in filtro_auditoria:
+                    df_tabela = df_audit[df_audit["Auditoria"] == "🟢 Mais Barato (Aprovado)"].copy()
+                else:
+                    df_tabela = df_audit.copy()
+
+                if not df_tabela.empty:
+                    tabela_div = df_tabela[[col_promotor, "Cidade", "Pdv", "Produto_Preco", col_preco, "Auditoria"]]
+                    tabela_div.columns = ["Promotor", "Cidade", "Loja", "Produto", "Preço Digitado (R$)", "Status do Preço"]
+                    html_div = tabela_div.to_html(escape=False, index=False)
+                    html_div = html_div.replace("<table>", f'<table style="width:100%; text-align:center; border-collapse: collapse; border: 1px solid {t["borda"]}; color: {t["texto"]}; background-color: {t["card_bg"]}; font-size: 13px;">')
+                    html_div = html_div.replace("<th>", f'<th style="text-align:center; padding: 10px; border: 1px solid {t["borda"]}; background-color: {t["secundario"]}; color: white !important; font-size: 13px;">')
+                    html_div = html_div.replace("<td>", f'<td style="text-align:center; padding: 10px; border: 1px solid {t["borda"]}; vertical-align: middle;">')
+                    st.markdown(html_div, unsafe_allow_html=True)
+                else:
+                    st.success("Nenhum dado encontrado para este filtro.")
+            else:
+                st.warning("Nenhuma leitura encontrada para os produtos configurados.")
+        else:
+            st.markdown("### Demais Itens (Sem Controle de Preço na Planilha)")
+            df_sem_controle = df[~df["Produto_Preco"].isin(precos_dict.keys())].copy()
+            f1, f2 = st.columns(2)
+            with f1:
+                filial_audit_outros = st.selectbox("Filial:", ["TODAS"] + FILIAIS, key="fil_outros")
+            with f2:
+                prom_outros = st.selectbox("Promotor:", ["TODOS"] + sorted(df[col_promotor].dropna().unique().tolist()), key="prom_outros")
+
+            if filial_audit_outros != "TODAS":
+                df_sem_controle = filtrar_por_filial(df_sem_controle, filial_audit_outros, col_filial)
+            if prom_outros != "TODOS":
+                df_sem_controle = df_sem_controle[df_sem_controle[col_promotor] == prom_outros]
+
+            if not df_sem_controle.empty:
+                tabela_outros = df_sem_controle[[col_promotor, "Cidade", "Pdv", "Produto_Preco", col_preco]]
+                tabela_outros.columns = ["Promotor", "Cidade", "Loja", "Produto", "Leitura Digitada"]
+                html_outros = tabela_outros.to_html(escape=False, index=False)
+                html_outros = html_outros.replace("<table>", f'<table style="width:100%; text-align:center; border-collapse: collapse; border: 1px solid {t["borda"]}; color: {t["texto"]}; background-color: {t["card_bg"]}; font-size: 13px;">')
+                html_outros = html_outros.replace("<th>", f'<th style="text-align:center; padding: 10px; border: 1px solid {t["borda"]}; background-color: {t["secundario"]}; color: white !important; font-size: 13px;">')
+                html_outros = html_outros.replace("<td>", f'<td style="text-align:center; padding: 10px; border: 1px solid {t["borda"]}; vertical-align: middle;">')
+                st.markdown(html_outros, unsafe_allow_html=True)
+            else:
+                st.success("Não há itens sem controle para exibir.")
+
+    elif pagina_selecionada == "🗺️ Mapa de Clientes":
+        st.markdown(f"## 🗺️ Mapeamento Geográfico de Clientes e Leituras — {periodo_atual}")
+        st.write("Visualização interativa estilo Leaflet/Folium com ícones personalizados para cada item em campo.")
+
+        if os.path.exists(ARQUIVO_CLIENTES_COORD):
+            try:
+                df_clientes_coord = pd.read_excel(ARQUIVO_CLIENTES_COORD)
+                df_clientes_coord["doc_limpo"] = df_clientes_coord["DOCUMENTO"].astype(str).str.replace(r"\D", "", regex=True)
+                col_cnpj_df = "Cnpj_Documento" if "Cnpj_Documento" in df.columns else "CnpjCpfPdv"
+                df["doc_limpo"] = df[col_cnpj_df].astype(str).str.replace(r"\D", "", regex=True)
+
+                df_mapa = pd.merge(df, df_clientes_coord[["doc_limpo", "LATITUDE", "LONGITUDE", "NOME", "ENDEREÇO", "CIDADE", "BAIRRO"]], on="doc_limpo", how="inner")
+
+                if not df_mapa.empty:
+                    st.markdown("---")
+                    c_f1, c_f2, c_f3, c_f4, c_f5 = st.columns(5)
+                    with c_f1:
+                        filial_mapa = st.selectbox("Filtrar Filial:", ["TODAS"] + FILIAIS, key="map_filial")
+                    with c_f2:
+                        promotores_disponiveis = sorted(df_mapa[col_promotor].dropna().unique().tolist())
+                        prom_mapa = st.selectbox("Promotor:", ["TODOS"] + promotores_disponiveis, key="map_prom")
+                    with c_f3:
+                        itens_disponiveis = sorted(df_mapa[col_item].dropna().unique().tolist())
+                        item_mapa = st.selectbox("Item / KPI:", ["TODOS OS ITENS"] + itens_disponiveis, key="map_item")
+                    with c_f4:
+                        status_mapa = st.selectbox("Status:", ["TODOS", "Aprovado", "Pendente", "Reprovado"], key="map_status")
+                    with c_f5:
+                        cidades_disponiveis = sorted(df_mapa["CIDADE"].dropna().astype(str).unique().tolist())
+                        cidade_mapa = st.selectbox("Cidade:", ["TODAS AS CIDADES"] + cidades_disponiveis, key="map_cidade")
+
+                    df_mapa_filtrado = df_mapa.copy()
+                    if filial_mapa != "TODAS":
+                        df_mapa_filtrado = filtrar_por_filial(df_mapa_filtrado, filial_mapa, col_filial)
+                    if prom_mapa != "TODOS":
+                        df_mapa_filtrado = df_mapa_filtrado[df_mapa_filtrado[col_promotor] == prom_mapa]
+                    if item_mapa != "TODOS OS ITENS":
+                        df_mapa_filtrado = df_mapa_filtrado[df_mapa_filtrado[col_item] == item_mapa]
+                    if status_mapa != "TODOS":
+                        df_mapa_filtrado = df_mapa_filtrado[df_mapa_filtrado[col_status].str.lower().str.contains(status_mapa.lower())]
+                    if cidade_mapa != "TODAS AS CIDADES":
+                        df_mapa_filtrado = df_mapa_filtrado[df_mapa_filtrado["CIDADE"].astype(str) == cidade_mapa]
+
+                    df_mapa_filtrado["LATITUDE"] = df_mapa_filtrado["LATITUDE"].astype(str).str.replace(",", ".", regex=False).astype(float)
+                    df_mapa_filtrado["LONGITUDE"] = df_mapa_filtrado["LONGITUDE"].astype(str).str.replace(",", ".", regex=False).astype(float)
+
+                    m1, m2, m3 = st.columns(3)
+                    m1.metric("Pontos Exibidos no Mapa", len(df_mapa_filtrado))
+                    m2.metric("Promotores Atuantes", df_mapa_filtrado[col_promotor].nunique())
+                    m3.metric("Lojas Únicas", df_mapa_filtrado["doc_limpo"].nunique())
+
+                    st.markdown("---")
+                    if not df_mapa_filtrado.empty:
+                        ponto_central_lat = df_mapa_filtrado["LATITUDE"].mean()
+                        ponto_central_lon = df_mapa_filtrado["LONGITUDE"].mean()
+
+                        m = folium.Map(location=[ponto_central_lat, ponto_central_lon], zoom_start=7, tiles="Esri.WorldStreetMap")
+
+                        def obter_estilo_personalizado(item_nome):
+                            i_str = str(item_nome).lower()
+                            if "sheba" in i_str:
+                                return "purple", "cat"
+                            elif "ponto extra" in i_str:
+                                return "red", "layer-group"
+                            elif "sachês" in i_str:
+                                return "green", "tags"
+                            elif "petiscos" in i_str:
+                                return "orange", "bone"
+                            else:
+                                return "blue", "info-sign"
+
+                        for _, r in df_mapa_filtrado.iterrows():
+                            cor_icone, icone_fa = obter_estilo_personalizado(r[col_item])
+                            html_popup = f"<b>Cliente:</b> {r['NOME']}<br/><b>Endereço:</b> {r['ENDEREÇO']}<br/><b>Promotor:</b> {r[col_promotor]}<br/><b>Item:</b> {r[col_item]}<br/><b>Status:</b> {r[col_status]}"
+                            folium.Marker(
+                                location=[r["LATITUDE"], r["LONGITUDE"]],
+                                popup=folium.Popup(html_popup, max_width=300),
+                                tooltip=f"{r['NOME']} - {r[col_item]}",
+                                icon=folium.Icon(color=cor_icone, icon=icone_fa, prefix="fa"),
+                            ).add_to(m)
+
+                        st_folium(m, use_container_width=True, height=550)
+                    else:
+                        st.warning("Nenhum registro encontrado para os filtros escolhidos.")
+                else:
+                    st.warning("Não foram encontrados cruzamentos de CNPJ entre as leituras e a base de clientes.")
+            except Exception as e:
+                st.error(f"Erro ao carregar o mapa: {e}")
+        else:
+            st.error(f"O arquivo `{ARQUIVO_CLIENTES_COORD}` não foi encontrado na pasta.")
+
+    elif pagina_selecionada == "📊 Presença por Sabores":
+        st.markdown(f"## 📊 Ranking de Presença por Sabores e Produtos — Small Bags ({periodo_atual})")
+        st.write("Análise exclusiva de quais sabores e produtos de Small Bags mais e menos aparecem em campo.")
+
+        c_ps1, c_ps2 = st.columns(2)
+        with c_ps1:
+            filial_ps = st.selectbox("Filtrar Filial:", ["TODAS"] + FILIAIS, key="ps_filial")
+        with c_ps2:
+            promotores_ps_list = ["TODOS"] + sorted(df[col_promotor].dropna().unique().tolist())
+            prom_ps = st.selectbox("Filtrar Promotor:", promotores_ps_list, key="ps_prom")
+
+        df_ps = df[df[col_item].astype(str).str.contains("Small Bags", case=False, na=False)].copy()
+        if filial_ps != "TODAS":
+            df_ps = filtrar_por_filial(df_ps, filial_ps, col_filial)
+        if prom_ps != "TODOS":
+            df_ps = df_ps[df_ps[col_promotor] == prom_ps]
+
+        if not df_ps.empty:
+            df_ps["Sabor_Produto"] = df_ps.apply(
+                lambda r: f"{r.get('OpcaoEmbalagem', 'N/A')} - {r.get('Embalagem', 'N/A')}" if pd.notna(r.get("OpcaoEmbalagem")) else str(r.get("Item", "N/A")),
+                axis=1,
+            )
+            ranking_sabores = df_ps.groupby("Sabor_Produto").size().reset_index(name="Quantidade")
+            ranking_sabores = ranking_sabores.sort_values(by="Quantidade", ascending=False).reset_index(drop=True)
+
+            st.markdown("---")
+            for idx, row in ranking_sabores.iterrows():
+                pos = idx + 1
+                prod_nome = row["Sabor_Produto"]
+                qtd = row["Quantidade"]
+                img_prod = obter_foto_produto_por_nome(prod_nome)
+                codigo_prod = obter_codigo_produto(prod_nome)
+                prod_nome_exibicao = f"{prod_nome} ({codigo_prod})" if codigo_prod else prod_nome
+
+                with st.container():
+                    col_img, col_info, col_qtd = st.columns([1, 8, 2])
+                    with col_img:
+                        if img_prod:
+                            st.image(img_prod, width=50)
+                        else:
+                            st.markdown("<div style='font-size:11px; color:#94A3B8; text-align:center; padding-top:10px;'>Sem foto</div>", unsafe_allow_html=True)
+                    with col_info:
+                        st.markdown(f"<div style='font-size: 15px; font-weight: bold; color: {t['secundario']}; padding-top: 12px;'>#{pos} - {prod_nome_exibicao}</div>", unsafe_allow_html=True)
+                    with col_qtd:
+                        st.markdown(f"<div style='font-size: 16px; font-weight: 800; color: {t['texto']}; text-align: right; padding-top: 12px;'>{qtd} leituras</div>", unsafe_allow_html=True)
+                    st.markdown(f"<hr style='margin: 4px 0; border-color: {t['borda']};'>", unsafe_allow_html=True)
+        else:
+            st.warning("Nenhum dado encontrado para os filtros selecionados.")
 
 # --- ASSINATURA DISCRETA NO RODAPÉ ---
 st.markdown("---")
