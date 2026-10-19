@@ -190,7 +190,6 @@ TEMAS_CORES = {
     },
 }
 
-# --- DICIONÁRIO DE CÓDIGOS MINASSAL PARA OS PRODUTOS SMALL BAGS ---
 MAPA_CODIGOS_MINASSAL = {
     "98985": "CHAMP ADULTO CARNE & CEREAL 900G",
     "98980": "CHAMP FILHOTES 900G",
@@ -218,26 +217,10 @@ MAPA_CODIGOS_MINASSAL = {
 }
 
 PERIODOS_CONFIG = {
-    "P10": {
-        "inicio": date(2026, 9, 6),
-        "fim": date(2026, 10, 3),
-        "label": "P10 (06/09 - 03/10)",
-    },
-    "P11": {
-        "inicio": date(2026, 10, 4),
-        "fim": date(2026, 10, 31),
-        "label": "P11 (04/10 - 31/10)",
-    },
-    "P12": {
-        "inicio": date(2026, 11, 1),
-        "fim": date(2026, 11, 28),
-        "label": "P12 (01/11 - 28/11)",
-    },
-    "P13": {
-        "inicio": date(2026, 11, 29),
-        "fim": date(2027, 1, 2),
-        "label": "P13 (29/11 - 02/01)",
-    },
+    "P10": {"inicio": date(2026, 9, 6), "fim": date(2026, 10, 3), "label": "P10 (06/09 - 03/10)"},
+    "P11": {"inicio": date(2026, 10, 4), "fim": date(2026, 10, 31), "label": "P11 (04/10 - 31/10)"},
+    "P12": {"inicio": date(2026, 11, 1), "fim": date(2026, 11, 28), "label": "P12 (01/11 - 28/11)"},
+    "P13": {"inicio": date(2026, 11, 29), "fim": date(2027, 1, 2), "label": "P13 (29/11 - 02/01)"},
 }
 
 FILIAIS = [
@@ -247,175 +230,43 @@ FILIAIS = [
     "Minassal Ltda - Juiz de Fora",
 ]
 
-CORES_FUNDO_FILIAIS = {
-    "Minassal Ltda - Pocos de Caldas": "#F0FDF4",
-    "Minassal Ltda - Sao Joao da Boa Vista": "#FDF2F8",
-    "Minassal Ltda - Sao Jose do Rio Preto": "#EFF6FF",
-    "Minassal Ltda - Juiz de Fora": "#FEFCE8",
-}
-
 ITENS_P = ["Small Bags", "Ponto Extra de Sachês/Petiscos"]
-ITENS_S = [
-    "Combos Virtuais Sachês",
-    "Combos Virtuais Petiscos",
-    "Sheba Creamy - Leve 2 Pague 1",
-]
+ITENS_S = ["Combos Virtuais Sachês", "Combos Virtuais Petiscos", "Sheba Creamy - Leve 2 Pague 1"]
 TODOS_ITENS = ITENS_P + ITENS_S
-ITENS_RODAPE = ["Combos Virtuais Sachês (KiteKat, Champ, Optimum)"]
 
 METAS_PADRAO = {
-    "Minassal Ltda - Pocos de Caldas": {
-        "Small Bags": 110,
-        "Ponto Extra de Sachês/Petiscos": 29,
-        "Combos Virtuais Sachês": 10,
-        "Combos Virtuais Petiscos": 10,
-        "Sheba Creamy - Leve 2 Pague 1": 10,
-    },
-    "Minassal Ltda - Sao Joao da Boa Vista": {
-        "Small Bags": 345,
-        "Ponto Extra de Sachês/Petiscos": 55,
-        "Combos Virtuais Sachês": 10,
-        "Combos Virtuais Petiscos": 10,
-        "Sheba Creamy - Leve 2 Pague 1": 10,
-    },
-    "Minassal Ltda - Sao Jose do Rio Preto": {
-        "Small Bags": 233,
-        "Ponto Extra de Sachês/Petiscos": 47,
-        "Combos Virtuais Sachês": 10,
-        "Combos Virtuais Petiscos": 10,
-        "Sheba Creamy - Leve 2 Pague 1": 10,
-    },
-    "Minassal Ltda - Juiz de Fora": {
-        "Small Bags": 94,
-        "Ponto Extra de Sachês/Petiscos": 20,
-        "Combos Virtuais Sachês": 10,
-        "Combos Virtuais Petiscos": 10,
-        "Sheba Creamy - Leve 2 Pague 1": 10,
-    },
+    "Minassal Ltda - Pocos de Caldas": {"Small Bags": 110, "Ponto Extra de Sachês/Petiscos": 29, "Combos Virtuais Sachês": 10, "Combos Virtuais Petiscos": 10, "Sheba Creamy - Leve 2 Pague 1": 10},
+    "Minassal Ltda - Sao Joao da Boa Vista": {"Small Bags": 345, "Ponto Extra de Sachês/Petiscos": 55, "Combos Virtuais Sachês": 10, "Combos Virtuais Petiscos": 10, "Sheba Creamy - Leve 2 Pague 1": 10},
+    "Minassal Ltda - Sao Jose do Rio Preto": {"Small Bags": 233, "Ponto Extra de Sachês/Petiscos": 47, "Combos Virtuais Sachês": 10, "Combos Virtuais Petiscos": 10, "Sheba Creamy - Leve 2 Pague 1": 10},
+    "Minassal Ltda - Juiz de Fora": {"Small Bags": 94, "Ponto Extra de Sachês/Petiscos": 20, "Combos Virtuais Sachês": 10, "Combos Virtuais Petiscos": 10, "Sheba Creamy - Leve 2 Pague 1": 10},
 }
 
 REGRAS_PRECOS_PADRAO = {
-    "KiteKat Adulto Mix de Carnes - Small Bags 0,9Kg": {
-        "min": 11.90,
-        "max": 11.90,
-        "nao_participante": False,
-    },
-    "Whiskas Sabor CARNE - Small Bags 0,5Kg": {
-        "min": 13.90,
-        "max": 14.90,
-        "nao_participante": False,
-    },
-    "Whiskas Sabor CARNE CASTRADOS - Small Bags 0,5Kg": {
-        "min": 13.90,
-        "max": 14.90,
-        "nao_participante": False,
-    },
-    "Whiskas Sabor PEIXE - Small Bags 0,5Kg": {
-        "min": 13.90,
-        "max": 14.90,
-        "nao_participante": False,
-    },
-    "Whiskas Sabor FILHOTE CARNE - Small Bags 0,5Kg": {
-        "min": 13.90,
-        "max": 14.90,
-        "nao_participante": False,
-    },
-    "Banana - Biscrok 500g": {
-        "min": 0.00,
-        "max": 0.00,
-        "nao_participante": True,
-    },
+    "KiteKat Adulto Mix de Carnes - Small Bags 0,9Kg": {"min": 11.90, "max": 11.90, "nao_participante": False},
+    "Whiskas Sabor CARNE - Small Bags 0,5Kg": {"min": 13.90, "max": 14.90, "nao_participante": False},
+    "Whiskas Sabor CARNE CASTRADOS - Small Bags 0,5Kg": {"min": 13.90, "max": 14.90, "nao_participante": False},
+    "Whiskas Sabor PEIXE - Small Bags 0,5Kg": {"min": 13.90, "max": 14.90, "nao_participante": False},
+    "Whiskas Sabor FILHOTE CARNE - Small Bags 0,5Kg": {"min": 13.90, "max": 14.90, "nao_participante": False},
+    "Banana - Biscrok 500g": {"min": 0.00, "max": 0.00, "nao_participante": True},
     "Maçã - Biscrok 500g": {"min": 0.00, "max": 0.00, "nao_participante": True},
-    "Champ Adulto Carne e Cereal - Small Bags 0,9Kg": {
-        "min": 11.90,
-        "max": 11.90,
-        "nao_participante": False,
-    },
-    "Champ Filhotes Carne e Cereal - Small Bags 0,9Kg": {
-        "min": 11.90,
-        "max": 11.90,
-        "nao_participante": False,
-    },
-    "Pedigree CARNE, FRANGO E CEREAIS - Small Bags 0,9Kg": {
-        "min": 18.90,
-        "max": 19.90,
-        "nao_participante": False,
-    },
-    "Pedigree FILHOTES - Small Bags 0,9Kg": {
-        "min": 18.90,
-        "max": 19.90,
-        "nao_participante": False,
-    },
-    "Pedigree RG CARNE E VEGETAIS - Small Bags 0,9Kg": {
-        "min": 18.90,
-        "max": 19.90,
-        "nao_participante": False,
-    },
-    "Pedigree RP CARNE E VEGETAIS - Small Bags 0,9Kg": {
-        "min": 18.90,
-        "max": 19.90,
-        "nao_participante": False,
-    },
-    "Pedigree NE AO LEITE - Small Bags 0,9Kg": {
-        "min": 14.90,
-        "max": 15.90,
-        "nao_participante": False,
-    },
-    "Pedigree NE Carne - Small Bags 0,9Kg": {
-        "min": 14.90,
-        "max": 15.90,
-        "nao_participante": False,
-    },
-    "Whiskas Sabor CARNE - Small Bags 0,9Kg": {
-        "min": 19.90,
-        "max": 20.90,
-        "nao_participante": False,
-    },
-    "Whiskas Sabor CARNE CASTRADOS - Small Bags 0,9Kg": {
-        "min": 19.90,
-        "max": 20.90,
-        "nao_participante": False,
-    },
-    "Whiskas Sabor FRANGO - Small Bags 0,9Kg": {
-        "min": 19.90,
-        "max": 20.90,
-        "nao_participante": False,
-    },
-    "Whiskas Sabor PEIXE - Small Bags 0,9Kg": {
-        "min": 19.90,
-        "max": 20.90,
-        "nao_participante": False,
-    },
-    "Whiskas Sabor PEIXE CASTRADOS - Small Bags 0,9Kg": {
-        "min": 19.90,
-        "max": 20.90,
-        "nao_participante": False,
-    },
-    "Whiskas Sabor FILHOTE CARNE - Small Bags 0,9Kg": {
-        "min": 19.90,
-        "max": 20.90,
-        "nao_participante": False,
-    },
-    "Pedigree CARNE, FRANGO E CEREAIS - Small Bags 2,7Kg": {
-        "min": 49.90,
-        "max": 54.90,
-        "nao_participante": False,
-    },
-    "Pedigree FILHOTES - Small Bags 2,7Kg": {
-        "min": 49.90,
-        "max": 54.90,
-        "nao_participante": False,
-    },
-    "Pedigree RG CARNE E VEGETAIS - Small Bags 2,7Kg": {
-        "min": 49.90,
-        "max": 54.90,
-        "nao_participante": False,
-    },
-    "Pedigree RP CARNE E VEGETAIS - Small Bags 2,7Kg": {
-        "min": 49.90,
-        "max": 54.90,
-        "nao_participante": False,
-    },
+    "Champ Adulto Carne e Cereal - Small Bags 0,9Kg": {"min": 11.90, "max": 11.90, "nao_participante": False},
+    "Champ Filhotes Carne e Cereal - Small Bags 0,9Kg": {"min": 11.90, "max": 11.90, "nao_participante": False},
+    "Pedigree CARNE, FRANGO E CEREAIS - Small Bags 0,9Kg": {"min": 18.90, "max": 19.90, "nao_participante": False},
+    "Pedigree FILHOTES - Small Bags 0,9Kg": {"min": 18.90, "max": 19.90, "nao_participante": False},
+    "Pedigree RG CARNE E VEGETAIS - Small Bags 0,9Kg": {"min": 18.90, "max": 19.90, "nao_participante": False},
+    "Pedigree RP CARNE E VEGETAIS - Small Bags 0,9Kg": {"min": 18.90, "max": 19.90, "nao_participante": False},
+    "Pedigree NE AO LEITE - Small Bags 0,9Kg": {"min": 14.90, "max": 15.90, "nao_participante": False},
+    "Pedigree NE Carne - Small Bags 0,9Kg": {"min": 14.90, "max": 15.90, "nao_participante": False},
+    "Whiskas Sabor CARNE - Small Bags 0,9Kg": {"min": 19.90, "max": 20.90, "nao_participante": False},
+    "Whiskas Sabor CARNE CASTRADOS - Small Bags 0,9Kg": {"min": 19.90, "max": 20.90, "nao_participante": False},
+    "Whiskas Sabor FRANGO - Small Bags 0,9Kg": {"min": 19.90, "max": 20.90, "nao_participante": False},
+    "Whiskas Sabor PEIXE - Small Bags 0,9Kg": {"min": 19.90, "max": 20.90, "nao_participante": False},
+    "Whiskas Sabor PEIXE CASTRADOS - Small Bags 0,9Kg": {"min": 19.90, "max": 20.90, "nao_participante": False},
+    "Whiskas Sabor FILHOTE CARNE - Small Bags 0,9Kg": {"min": 19.90, "max": 20.90, "nao_participante": False},
+    "Pedigree CARNE, FRANGO E CEREAIS - Small Bags 2,7Kg": {"min": 49.90, "max": 54.90, "nao_participante": False},
+    "Pedigree FILHOTES - Small Bags 2,7Kg": {"min": 49.90, "max": 54.90, "nao_participante": False},
+    "Pedigree RG CARNE E VEGETAIS - Small Bags 2,7Kg": {"min": 49.90, "max": 54.90, "nao_participante": False},
+    "Pedigree RP CARNE E VEGETAIS - Small Bags 2,7Kg": {"min": 49.90, "max": 54.90, "nao_participante": False},
 }
 
 def carregar_mapeamento_fotos():
@@ -445,8 +296,9 @@ def salvar_mapeamento_fotos(map_fotos):
     except Exception as e:
         st.error(f"Erro ao salvar mapeamento de fotos: {e}")
 
+# Aponta corretamente para a pasta de fotos dos promotores no repositório
 if "pasta_fotos" not in st.session_state:
-    st.session_state["pasta_fotos"] = "fotos"
+    st.session_state["pasta_fotos"] = "fotos_promotores"
 
 if "mapeamento_manual_fotos" not in st.session_state:
     st.session_state["mapeamento_manual_fotos"] = carregar_mapeamento_fotos()
@@ -1189,7 +1041,7 @@ if df is not None and not df.empty:
                     pdf.cell(30, 6, str(item["reprovados"]), 0, 1, "C")
                     pdf.ln(4)
 
-                return pdf.output(dest="S").encode("latin1", errors="replace")
+                return pdf.output()
 
             pdf_bytes = gerar_pdf_ranking(lista_ranking, filial_rank_sel, df)
             st.download_button(
@@ -1549,7 +1401,7 @@ if df is not None and not df.empty:
                         st.markdown(f"<div style='font-size: 16px; font-weight: 800; color: {t['texto']}; text-align: right; padding-top: 12px;'>{qtd} leituras</div>", unsafe_allow_html=True)
                     st.markdown(f"<hr style='margin: 4px 0; border-color: {t['borda']};'>", unsafe_allow_html=True)
         else:
-            st.warning("Nenhum dado encontrado para os filtros selecionados.")
+            st.warning("Nenhum dado encontrado para os filtros escolhidos.")
 
 # --- ASSINATURA DISCRETA NO RODAPÉ ---
 st.markdown("---")
