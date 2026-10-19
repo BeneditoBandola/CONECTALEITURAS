@@ -37,7 +37,6 @@ CONFIG_PRECOS_FILE = "config_precos_minassal.json"
 CONFIG_FOTOS_FILE = "config_fotos_promotores.json"
 
 PASTA_PRODUTOS = "fotos"
-ARQUIVO_CLIENTES_COORD = "clientes com coordenadas.xlsx"
 
 # --- DEFINIÇÃO DOS PERÍODOS PARA A AUTOMAÇÃO (P10 a P13) ---
 PERIODOS = {
@@ -296,7 +295,6 @@ def salvar_mapeamento_fotos(map_fotos):
     except Exception as e:
         st.error(f"Erro ao salvar mapeamento de fotos: {e}")
 
-# Aponta corretamente para a pasta de fotos dos promotores no repositório
 if "pasta_fotos" not in st.session_state:
     st.session_state["pasta_fotos"] = "fotos_promotores"
 
@@ -655,7 +653,7 @@ with st.expander("Gerenciar e Enviar Fotos dos Promotores", expanded=False):
                 time.sleep(0.5)
                 st.rerun()
 
-# --- BARRA SUPERIOR SINCRONIZADA E HORIZONTAL ---
+# --- BARRA SUPERIOR SINCRONIZADA E HORIZONTAL (Sem Mapa de Clientes) ---
 abas_topo = [
     "📺 Poços de Caldas",
     "📺 São João da Boa Vista",
@@ -664,7 +662,6 @@ abas_topo = [
     "🏆 Ranking de Leituras",
     "🚨 Registros Reprovados",
     "💰 Auditoria de Preços",
-    "🗺️ Mapa de Clientes",
     "📊 Presença por Sabores",
 ]
 
@@ -934,123 +931,6 @@ if df is not None and not df.empty:
                 })
 
             lista_ranking = sorted(lista_ranking, key=lambda x: x["total"], reverse=True)
-
-            def gerar_pdf_ranking(dados_ranking, filial_nome, df_geral):
-                class PDFRelatorio(FPDF):
-                    def footer(self):
-                        self.set_y(-10)
-                        self.set_font("Helvetica", "I", 8)
-                        self.set_text_color(100, 116, 139)
-                        self.cell(0, 5, "Desenvolvido por Benedito Bandola", 0, 0, "C")
-
-                pdf = PDFRelatorio(orientation="L", unit="mm", format="A4")
-                pdf.set_auto_page_break(auto=True, margin=15)
-                pdf.add_page()
-                pdf.set_font("Helvetica", "B", 16)
-                pdf.set_text_color(30, 58, 138)
-                pdf.cell(0, 8, f"Leituras Minassal - {periodo_atual}", ln=True, align="C")
-
-                pdf.set_font("Helvetica", "I", 9)
-                pdf.set_text_color(100, 116, 139)
-                pdf.cell(0, 5, f"Filtro: {filial_nome} | Emissão: {datetime.now().strftime('%d/%m/%Y %H:%M')}", ln=True, align="C")
-                pdf.ln(3)
-
-                pdf.set_draw_color(203, 213, 225)
-                pdf.set_line_width(0.5)
-                pdf.line(10, pdf.get_y(), 287, pdf.get_y())
-                pdf.ln(3)
-
-                pdf.set_fill_color(30, 58, 138)
-                pdf.set_text_color(255, 255, 255)
-                pdf.set_font("Helvetica", "B", 9)
-                pdf.rect(10, pdf.get_y(), 277, 7, style="F")
-
-                pdf.set_xy(12, pdf.get_y() + 1)
-                pdf.cell(113, 5, "PROMOTOR / FILIAL", 0, 0, "L")
-                pdf.cell(28, 5, "TOTAL", 0, 0, "C")
-                pdf.cell(32, 5, "APROVADOS", 0, 0, "C")
-                pdf.cell(32, 5, "APV + PENDENTES", 0, 0, "C")
-                pdf.cell(32, 5, "CANCELADOS", 0, 0, "C")
-                pdf.cell(30, 5, "REPROVADOS", 0, 1, "C")
-                pdf.ln(2)
-
-                temp_files_to_delete = []
-                rgb_filiais = {
-                    "Pocos de Caldas": (240, 253, 244),
-                    "Sao Joao da Boa Vista": (253, 242, 248),
-                    "Sao Jose do Rio Preto": (239, 246, 255),
-                    "Juiz de Fora": (254, 252, 232),
-                }
-
-                for idx, item in enumerate(dados_ranking, start=1):
-                    y_inicial = pdf.get_y()
-                    df_p_item = item["df_promotor"]
-                    filial_promotor_str = "N/A"
-                    if not df_p_item.empty and col_filial in df_p_item.columns:
-                        val_filial_bruto = str(df_p_item[col_filial].iloc[0])
-                        filial_promotor_str = val_filial_bruto.split("-")[-1].strip()
-
-                    if filial_promotor_str.upper() == "MINASSAL LTDA":
-                        filial_promotor_str = "MINASSAL SAO JOAO DA BOA VISTA"
-
-                    cor_rgb_fundo = (255, 255, 255)
-                    for chave_f, rgb_val in rgb_filiais.items():
-                        if chave_f.lower() in filial_promotor_str.lower():
-                            cor_rgb_fundo = rgb_val
-                            break
-
-                    pdf.set_fill_color(cor_rgb_fundo[0], cor_rgb_fundo[1], cor_rgb_fundo[2])
-                    pdf.set_draw_color(203, 213, 225)
-                    pdf.set_line_width(0.3)
-                    pdf.rect(10, y_inicial, 277, 21, style="DF")
-
-                    foto_obj = obter_foto_promotor(item["promotor"])
-                    if isinstance(foto_obj, Image.Image):
-                        try:
-                            if foto_obj.mode in ("RGBA", "P"):
-                                foto_obj = foto_obj.convert("RGB")
-                            temp_img = tempfile.NamedTemporaryFile(delete=False, suffix=".png")
-                            foto_obj.save(temp_img, format="PNG")
-                            temp_img.close()
-                            temp_files_to_delete.append(temp_img.name)
-                            pdf.image(temp_img.name, x=14, y=y_inicial + 3.5, w=14, h=14)
-                        except:
-                            pass
-
-                    pdf.set_xy(34, y_inicial + 3)
-                    pdf.set_font("Helvetica", "B", 10)
-                    pdf.set_text_color(15, 23, 42)
-                    pdf.cell(88, 5, f"#{idx} - {item['promotor']}", ln=0)
-
-                    pdf.set_xy(34, y_inicial + 11.5)
-                    pdf.set_font("Helvetica", "I", 8.5)
-                    pdf.set_text_color(71, 85, 105)
-                    pdf.cell(88, 4, f"Filial: {filial_promotor_str}", ln=0)
-
-                    pdf.set_xy(125, y_inicial + 6)
-                    pdf.set_font("Helvetica", "B", 10)
-                    pdf.set_text_color(30, 58, 138)
-                    pdf.cell(28, 6, str(item["total"]), 0, 0, "C")
-                    pdf.set_text_color(22, 163, 74)
-                    pdf.cell(32, 6, str(item["aprovados"]), 0, 0, "C")
-                    pdf.set_text_color(217, 119, 6)
-                    pdf.cell(32, 6, str(item["apv_pend"]), 0, 0, "C")
-                    pdf.set_text_color(202, 138, 4)
-                    pdf.cell(32, 6, str(item["cancelados"]), 0, 0, "C")
-                    pdf.set_text_color(220, 38, 38)
-                    pdf.cell(30, 6, str(item["reprovados"]), 0, 1, "C")
-                    pdf.ln(4)
-
-                return pdf.output()
-
-            pdf_bytes = gerar_pdf_ranking(lista_ranking, filial_rank_sel, df)
-            st.download_button(
-                label="Baixar Relatório em PDF Executivo (Ranking + Metas)",
-                data=pdf_bytes,
-                file_name=f"Ranking_Metas_{periodo_atual}_{filial_rank_sel.replace(' ', '_')}.pdf",
-                mime="application/pdf",
-                use_container_width=True,
-            )
             st.markdown("<br>", unsafe_allow_html=True)
 
             for posicao, item_rank in enumerate(lista_ranking, start=1):
@@ -1264,96 +1144,6 @@ if df is not None and not df.empty:
             else:
                 st.success("Não há itens sem controle para exibir.")
 
-    elif pagina_selecionada == "🗺️ Mapa de Clientes":
-        st.markdown(f"## 🗺️ Mapeamento Geográfico de Clientes e Leituras — {periodo_atual}")
-        st.write("Visualização interativa estilo Leaflet/Folium com ícones personalizados para cada item em campo.")
-
-        if os.path.exists(ARQUIVO_CLIENTES_COORD):
-            try:
-                df_clientes_coord = pd.read_excel(ARQUIVO_CLIENTES_COORD)
-                df_clientes_coord["doc_limpo"] = df_clientes_coord["DOCUMENTO"].astype(str).str.replace(r"\D", "", regex=True)
-                col_cnpj_df = "Cnpj_Documento" if "Cnpj_Documento" in df.columns else "CnpjCpfPdv"
-                df["doc_limpo"] = df[col_cnpj_df].astype(str).str.replace(r"\D", "", regex=True)
-
-                df_mapa = pd.merge(df, df_clientes_coord[["doc_limpo", "LATITUDE", "LONGITUDE", "NOME", "ENDEREÇO", "CIDADE", "BAIRRO"]], on="doc_limpo", how="inner")
-
-                if not df_mapa.empty:
-                    st.markdown("---")
-                    c_f1, c_f2, c_f3, c_f4, c_f5 = st.columns(5)
-                    with c_f1:
-                        filial_mapa = st.selectbox("Filtrar Filial:", ["TODAS"] + FILIAIS, key="map_filial")
-                    with c_f2:
-                        promotores_disponiveis = sorted(df_mapa[col_promotor].dropna().unique().tolist())
-                        prom_mapa = st.selectbox("Promotor:", ["TODOS"] + promotores_disponiveis, key="map_prom")
-                    with c_f3:
-                        itens_disponiveis = sorted(df_mapa[col_item].dropna().unique().tolist())
-                        item_mapa = st.selectbox("Item / KPI:", ["TODOS OS ITENS"] + itens_disponiveis, key="map_item")
-                    with c_f4:
-                        status_mapa = st.selectbox("Status:", ["TODOS", "Aprovado", "Pendente", "Reprovado"], key="map_status")
-                    with c_f5:
-                        cidades_disponiveis = sorted(df_mapa["CIDADE"].dropna().astype(str).unique().tolist())
-                        cidade_mapa = st.selectbox("Cidade:", ["TODAS AS CIDADES"] + cidades_disponiveis, key="map_cidade")
-
-                    df_mapa_filtrado = df_mapa.copy()
-                    if filial_mapa != "TODAS":
-                        df_mapa_filtrado = filtrar_por_filial(df_mapa_filtrado, filial_mapa, col_filial)
-                    if prom_mapa != "TODOS":
-                        df_mapa_filtrado = df_mapa_filtrado[df_mapa_filtrado[col_promotor] == prom_mapa]
-                    if item_mapa != "TODOS OS ITENS":
-                        df_mapa_filtrado = df_mapa_filtrado[df_mapa_filtrado[col_item] == item_mapa]
-                    if status_mapa != "TODOS":
-                        df_mapa_filtrado = df_mapa_filtrado[df_mapa_filtrado[col_status].str.lower().str.contains(status_mapa.lower())]
-                    if cidade_mapa != "TODAS AS CIDADES":
-                        df_mapa_filtrado = df_mapa_filtrado[df_mapa_filtrado["CIDADE"].astype(str) == cidade_mapa]
-
-                    df_mapa_filtrado["LATITUDE"] = df_mapa_filtrado["LATITUDE"].astype(str).str.replace(",", ".", regex=False).astype(float)
-                    df_mapa_filtrado["LONGITUDE"] = df_mapa_filtrado["LONGITUDE"].astype(str).str.replace(",", ".", regex=False).astype(float)
-
-                    m1, m2, m3 = st.columns(3)
-                    m1.metric("Pontos Exibidos no Mapa", len(df_mapa_filtrado))
-                    m2.metric("Promotores Atuantes", df_mapa_filtrado[col_promotor].nunique())
-                    m3.metric("Lojas Únicas", df_mapa_filtrado["doc_limpo"].nunique())
-
-                    st.markdown("---")
-                    if not df_mapa_filtrado.empty:
-                        ponto_central_lat = df_mapa_filtrado["LATITUDE"].mean()
-                        ponto_central_lon = df_mapa_filtrado["LONGITUDE"].mean()
-
-                        m = folium.Map(location=[ponto_central_lat, ponto_central_lon], zoom_start=7, tiles="Esri.WorldStreetMap")
-
-                        def obter_estilo_personalizado(item_nome):
-                            i_str = str(item_nome).lower()
-                            if "sheba" in i_str:
-                                return "purple", "cat"
-                            elif "ponto extra" in i_str:
-                                return "red", "layer-group"
-                            elif "sachês" in i_str:
-                                return "green", "tags"
-                            elif "petiscos" in i_str:
-                                return "orange", "bone"
-                            else:
-                                return "blue", "info-sign"
-
-                        for _, r in df_mapa_filtrado.iterrows():
-                            cor_icone, icone_fa = obter_estilo_personalizado(r[col_item])
-                            html_popup = f"<b>Cliente:</b> {r['NOME']}<br/><b>Endereço:</b> {r['ENDEREÇO']}<br/><b>Promotor:</b> {r[col_promotor]}<br/><b>Item:</b> {r[col_item]}<br/><b>Status:</b> {r[col_status]}"
-                            folium.Marker(
-                                location=[r["LATITUDE"], r["LONGITUDE"]],
-                                popup=folium.Popup(html_popup, max_width=300),
-                                tooltip=f"{r['NOME']} - {r[col_item]}",
-                                icon=folium.Icon(color=cor_icone, icon=icone_fa, prefix="fa"),
-                            ).add_to(m)
-
-                        st_folium(m, use_container_width=True, height=550)
-                    else:
-                        st.warning("Nenhum registro encontrado para os filtros escolhidos.")
-                else:
-                    st.warning("Não foram encontrados cruzamentos de CNPJ entre as leituras e a base de clientes.")
-            except Exception as e:
-                st.error(f"Erro ao carregar o mapa: {e}")
-        else:
-            st.error(f"O arquivo `{ARQUIVO_CLIENTES_COORD}` não foi encontrado na pasta.")
-
     elif pagina_selecionada == "📊 Presença por Sabores":
         st.markdown(f"## 📊 Ranking de Presença por Sabores e Produtos — Small Bags ({periodo_atual})")
         st.write("Análise exclusiva de quais sabores e produtos de Small Bags mais e menos aparecem em campo.")
@@ -1401,7 +1191,7 @@ if df is not None and not df.empty:
                         st.markdown(f"<div style='font-size: 16px; font-weight: 800; color: {t['texto']}; text-align: right; padding-top: 12px;'>{qtd} leituras</div>", unsafe_allow_html=True)
                     st.markdown(f"<hr style='margin: 4px 0; border-color: {t['borda']};'>", unsafe_allow_html=True)
         else:
-            st.warning("Nenhum dado encontrado para os filtros escolhidos.")
+            st.warning("Nenhum dado encontrado para os filtros selecionados.")
 
 # --- ASSINATURA DISCRETA NO RODAPÉ ---
 st.markdown("---")
