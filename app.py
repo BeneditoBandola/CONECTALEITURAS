@@ -410,7 +410,7 @@ def obter_foto_promotor(nome):
     nome_limpo_orig = nome.strip()
     nome_limpo_baixo = nome_limpo_orig.lower()
 
-    # Tratamento especial para nomes exatos conforme arquivos no GitHub (Carolina e Saruete)
+    # Busca exata para Carolina e Saruete (arquivos específicos confirmados)
     if "carolina" in nome_limpo_baixo:
         for arq_carolina in ["carolina.jpg", "carolina.png", "Carolina.jpg", "Carolina.png"]:
             caminho_c = os.path.join(pasta_alvo, arq_carolina)
@@ -562,7 +562,7 @@ periodo_atual = st.session_state["periodo_ativo"]
 st.markdown("---")
 col_t1, col_t2 = st.columns([2, 5])
 with col_t1:
-    st.markdown("<b style='font-size: 14px;'>🎨 Tema do Painel:</b>", unsafe_allow_html=True)
+    st.markdown("<b style='font-size: 14px; color: #000000;'>🎨 Tema do Painel:</b>", unsafe_allow_html=True)
 with col_t2:
     nome_tema_selecionado = st.selectbox(
         "Selecione o Tema:",
@@ -573,14 +573,15 @@ with col_t2:
 
 t = TEMAS_CORES[nome_tema_selecionado]
 
-# --- APLICAÇÃO DINÂMICA DO TEMA ESCOLHIDO VIA CSS (Nomes e textos em preto) ---
+# --- APLICAÇÃO DINÂMICA DO TEMA ESCOLHIDO VIA CSS (Texto geral em preto, cabeçalhos de tabela em branco) ---
 st.markdown(
     f"""
     <style>
         [data-testid="stAppViewContainer"] {{ background-color: {t['bg_app']} !important; }}
         [data-testid="stHeader"] {{ background-color: {t['bg_header']} !important; }}
         [data-testid="stSidebar"] {{ display: none; }}
-        h1, h2, h3, h4, p, label, strong, b, span, th, td {{ color: #000000 !important; font-family: 'Segoe UI', sans-serif; }}
+        h1, h2, h3, h4, p, label, strong, b, span, td {{ color: #000000 !important; font-family: 'Segoe UI', sans-serif; }}
+        th {{ color: #FFFFFF !important; font-family: 'Segoe UI', sans-serif; }}
         input, textarea, select {{
             background-color: {t['card_bg']} !important;
             color: #000000 !important;
@@ -662,7 +663,7 @@ with st.expander("Gerenciar e Enviar Fotos dos Promotores", expanded=False):
                 time.sleep(0.5)
                 st.rerun()
 
-# --- BARRA SUPERIOR SINCRONIZADA E HORIZONTAL (Sem Mapa de Clientes) ---
+# --- BARRA SUPERIOR SINCRONIZADA E HORIZONTAL ---
 abas_topo = [
     "📺 Poços de Caldas",
     "📺 São João da Boa Vista",
@@ -848,9 +849,9 @@ if df is not None and not df.empty:
                 })
             df_tab = pd.DataFrame(dados_tabela_filial)
             html_table = f'<table style="width:100%; text-align:center; border-collapse: collapse; border: 1px solid {t["borda"]}; color: #000000; background-color: {t["card_bg"]}; font-size: 13px;">'
-            html_table += f'<tr style="background-color: {t["secundario"]}; color: white;">'
+            html_table += f'<tr style="background-color: {t["secundario"]}; color: #FFFFFF !important;">'
             for col_n in ["Item / Ações", "Meta", "Aprovado", "Pendente", "SOMANDO APROVADO E PENDENTES", "Falta", "Progresso"]:
-                html_table += f'<th style="text-align:center; padding: 10px; border: 1px solid {t["borda"]}; color: white !important;">{col_n}</th>'
+                html_table += f'<th style="text-align:center; padding: 10px; border: 1px solid {t["borda"]}; color: #FFFFFF !important;">{col_n}</th>'
             html_table += "</tr>"
             for _, r in df_tab.iterrows():
                 html_table += f'<tr style="background-color: {t["card_bg"]};">'
@@ -976,7 +977,7 @@ if df is not None and not df.empty:
                             src_img = f"data:image/png;base64,{img_b64}"
                         else:
                             src_img = foto_prom
-                        st.markdown(f"<div style='display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;'><img src='{src_img}' style='width: 90px; height: 90px; border-radius: 8px; object-fit: cover; border: 1px solid {t['borda']}; margin-bottom: 6px;'><div style='font-size: 14px; font-weight: bold; color: #000000;'>{prom}</div></div>", unsafe_allow_html=True)
+                        st.markdown(f"<div style='display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;'><img src='{src_img}' style='width: 90px; height: 90px; border-radius: 8px; object-fit: cover; border: 2px solid {t['borda']}; margin-bottom: 6px;'><div style='font-size: 14px; font-weight: bold; color: #000000;'>{prom}</div></div>", unsafe_allow_html=True)
                     with c_detalhes:
                         st.markdown(
                             f"<div style='display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 10px;'><div style='background-color: {t['bg_app']}; border: 1px solid {t['borda']}; padding: 8px 12px; border-radius: 8px; text-align: center;'><div style='font-size: 11px; font-weight: bold; color: #000000;'>TOTAL</div><div style='font-size: 16px; color: {t['secundario']}; font-weight: 800;'>{total}</div></div><div style='background-color: #F0FDF4; border: 1px solid #DCFCE7; padding: 8px 12px; border-radius: 8px; text-align: center;'><div style='font-size: 11px; font-weight: bold; color: #000000;'>APROVADOS</div><div style='font-size: 16px; color: #16A34A; font-weight: 800;'>{aprovados}</div></div><div style='background-color: #FEF3C7; border: 1px solid #FDE68A; padding: 8px 12px; border-radius: 8px; text-align: center;'><div style='font-size: 11px; font-weight: bold; color: #000000;'>APV + PEND</div><div style='font-size: 16px; color: #D97706; font-weight: 800;'>{apv_pend}</div></div><div style='background-color: #FEFCE8; border: 1px solid #FEF08A; padding: 8px 12px; border-radius: 8px; text-align: center;'><div style='font-size: 11px; font-weight: bold; color: #000000;'>CANCELADOS</div><div style='font-size: 16px; color: #CA8A04; font-weight: 800;'>{cancelados}</div></div><div style='background-color: #FEF2F2; border: 1px solid #FEE2E2; padding: 8px 12px; border-radius: 8px; text-align: center;'><div style='font-size: 11px; font-weight: bold; color: #000000;'>REPROVADOS</div><div style='font-size: 16px; color: #DC2626; font-weight: 800;'>{reprovados}</div></div></div>",
@@ -1007,7 +1008,7 @@ if df is not None and not df.empty:
 
             html_rep_geral = tabela_rep_geral.to_html(escape=False, index=False)
             html_rep_geral = html_rep_geral.replace("<table>", f'<table style="width:100%; text-align:center; border-collapse: collapse; border: 1px solid {t["borda"]}; color: #000000; background-color: {t["card_bg"]}; font-size: 13px;">')
-            html_rep_geral = html_rep_geral.replace("<th>", f'<th style="text-align:center; padding: 10px; border: 1px solid {t["borda"]}; background-color: #DC2626; color: white !important; font-size: 13px;">')
+            html_rep_geral = html_rep_geral.replace("<th>", f'<th style="text-align:center; padding: 10px; border: 1px solid {t["borda"]}; background-color: #DC2626; color: #FFFFFF !important; font-size: 13px;">')
             html_rep_geral = html_rep_geral.replace("<td>", f'<td style="text-align:center; padding: 10px; border: 1px solid {t["borda"]}; vertical-align: middle; color: #000000;">')
             st.markdown(html_rep_geral, unsafe_allow_html=True)
         else:
@@ -1121,7 +1122,7 @@ if df is not None and not df.empty:
                     tabela_div.columns = ["Promotor", "Cidade", "Loja", "Produto", "Preço Digitado (R$)", "Status do Preço"]
                     html_div = tabela_div.to_html(escape=False, index=False)
                     html_div = html_div.replace("<table>", f'<table style="width:100%; text-align:center; border-collapse: collapse; border: 1px solid {t["borda"]}; color: #000000; background-color: {t["card_bg"]}; font-size: 13px;">')
-                    html_div = html_div.replace("<th>", f'<th style="text-align:center; padding: 10px; border: 1px solid {t["borda"]}; background-color: {t["secundario"]}; color: white !important; font-size: 13px;">')
+                    html_div = html_div.replace("<th>", f'<th style="text-align:center; padding: 10px; border: 1px solid {t["borda"]}; background-color: {t["secundario"]}; color: #FFFFFF !important; font-size: 13px;">')
                     html_div = html_div.replace("<td>", f'<td style="text-align:center; padding: 10px; border: 1px solid {t["borda"]}; vertical-align: middle; color: #000000;">')
                     st.markdown(html_div, unsafe_allow_html=True)
                 else:
@@ -1147,7 +1148,7 @@ if df is not None and not df.empty:
                 tabela_outros.columns = ["Promotor", "Cidade", "Loja", "Produto", "Leitura Digitada"]
                 html_outros = tabela_outros.to_html(escape=False, index=False)
                 html_outros = html_outros.replace("<table>", f'<table style="width:100%; text-align:center; border-collapse: collapse; border: 1px solid {t["borda"]}; color: #000000; background-color: {t["card_bg"]}; font-size: 13px;">')
-                html_outros = html_outros.replace("<th>", f'<th style="text-align:center; padding: 10px; border: 1px solid {t["borda"]}; background-color: {t["secundario"]}; color: white !important; font-size: 13px;">')
+                html_outros = html_outros.replace("<th>", f'<th style="text-align:center; padding: 10px; border: 1px solid {t["borda"]}; background-color: {t["secundario"]}; color: #FFFFFF !important; font-size: 13px;">')
                 html_outros = html_outros.replace("<td>", f'<td style="text-align:center; padding: 10px; border: 1px solid {t["borda"]}; vertical-align: middle; color: #000000;">')
                 st.markdown(html_outros, unsafe_allow_html=True)
             else:
