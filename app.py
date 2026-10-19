@@ -1,5 +1,5 @@
 import base64
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 import difflib
 import io
 from io import BytesIO
@@ -768,7 +768,8 @@ caminho_csv = "relatorio_questionarios.csv"
 horario_arquivo_str = "Arquivo não encontrado"
 if os.path.exists(caminho_csv):
     timestamp_mod = os.path.getmtime(caminho_csv)
-    horario_arquivo_str = datetime.fromtimestamp(timestamp_mod).strftime("%d/%m/%Y às %H:%M:%S")
+    dt_ajustada = datetime.fromtimestamp(timestamp_mod) - timedelta(hours=3)
+    horario_arquivo_str = dt_ajustada.strftime("%d/%m/%Y às %H:%M:%S")
 
 df = carregar_dados(caminho_csv, periodo_atual) if os.path.exists(caminho_csv) else None
 metas_dict = carregar_configuracoes()
