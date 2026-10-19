@@ -63,6 +63,13 @@ def obter_datas_periodo(nome_periodo):
 
 def baixar_planilha_pdvpet(periodo_escolhido="P11"):
     data_de_str, data_ate_str = obter_datas_periodo(periodo_escolhido)
+    
+    # Garante que o navegador do Playwright está instalado no ambiente cloud
+    try:
+        subprocess.run([sys.executable, "-m", "playwright", "install", "chromium"], capture_output=True, text=True)
+    except Exception:
+        pass
+
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True, slow_mo=500)
         context = browser.new_context()
