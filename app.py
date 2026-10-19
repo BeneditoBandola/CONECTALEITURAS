@@ -1,6 +1,5 @@
 import base64
 from datetime import date, datetime
-import diffl_ib if False else None # apenas ajuste de importação interna
 import difflib
 import io
 from io import BytesIO
