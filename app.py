@@ -200,7 +200,7 @@ FILIAIS = [
     "Minassal Ltda - Juiz de Fora",
 ]
 
-# --- METAS PADRÃO POR PERÍODO (ATUALIZADAS COM P12 E P13 OFICIAIS) ---
+# --- METAS PADRÃO POR PERÍODO (ORDENADAS E ATUALIZADAS) ---
 METAS_PADRAO_GERAL = {
     "P10": {
         "Minassal Ltda - Pocos de Caldas": {"Ponto Extra de Sachês/Petiscos": 29, "Small Bags": 110, "Combos Virtuais Sachês": 10, "Combos Virtuais Petiscos": 10, "Sheba Creamy - Leve 2 Pague 1": 10, "Biscrok Churrasco": 10},
@@ -327,6 +327,7 @@ def obter_todos_itens(periodo_sel):
                 for it in metas_f.keys():
                     itens_cadastrados.add(it)
     
+    # Ordem exata solicitada para o Desempenho de Metas
     ordem_preferencial = [
         "Ponto Extra de Sachês/Petiscos",
         "Small Bags",
@@ -380,6 +381,8 @@ def carregar_dados(caminho_arquivo, periodo_sel):
                 "Ação de Petiscos": "Ação de Petiscos",
                 "Ponto Extra de Sachês/Petiscos": "Ponto Extra de Sachês/Petiscos",
                 "Combos Virtuais Sachês": "Combos Virtuais Sachês",
+                "Visibilidade Biscrok Churrasco": "Biscrok Churrasco",
+                "Visibilidade Biscroc Churrasco": "Biscrok Churrasco",
             })
             df["Item"] = df["Item"].apply(
                 lambda x: "Combos Virtuais Sachês" if "Combos Virtuais" in x and "Sach" in x and "Optimum" not in x else x
@@ -389,6 +392,10 @@ def carregar_dados(caminho_arquivo, periodo_sel):
             )
             df["Item"] = df["Item"].apply(
                 lambda x: "Combos Virtuais Petiscos" if "Combos Virtuais" in x and "Petisco" in x else x
+            )
+            # Regra para capturar qualquer variação de visibilidade do biscrok churrasco
+            df["Item"] = df["Item"].apply(
+                lambda x: "Biscrok Churrasco" if "churrasco" in x.lower() and ("biscrok" in x.lower() or "biscroc" in x.lower()) else x
             )
 
         if "Data" in df.columns:
