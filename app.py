@@ -200,31 +200,31 @@ FILIAIS = [
     "Minassal Ltda - Juiz de Fora",
 ]
 
-# --- METAS PADRÃO POR PERÍODO (HISTÓRICO) ---
+# --- METAS PADRÃO POR PERÍODO (ATUALIZADAS COM P12 E P13 OFICIAIS) ---
 METAS_PADRAO_GERAL = {
     "P10": {
-        "Minassal Ltda - Pocos de Caldas": {"Small Bags": 110, "Ponto Extra de Sachês/Petiscos": 29, "Combos Virtuais Sachês": 10, "Combos Virtuais Petiscos": 10, "Sheba Creamy - Leve 2 Pague 1": 10},
-        "Minassal Ltda - Sao Joao da Boa Vista": {"Small Bags": 345, "Ponto Extra de Sachês/Petiscos": 55, "Combos Virtuais Sachês": 10, "Combos Virtuais Petiscos": 10, "Sheba Creamy - Leve 2 Pague 1": 10},
-        "Minassal Ltda - Sao Jose do Rio Preto": {"Small Bags": 233, "Ponto Extra de Sachês/Petiscos": 47, "Combos Virtuais Sachês": 10, "Combos Virtuais Petiscos": 10, "Sheba Creamy - Leve 2 Pague 1": 10},
-        "Minassal Ltda - Juiz de Fora": {"Small Bags": 94, "Ponto Extra de Sachês/Petiscos": 20, "Combos Virtuais Sachês": 10, "Combos Virtuais Petiscos": 10, "Sheba Creamy - Leve 2 Pague 1": 10},
+        "Minassal Ltda - Pocos de Caldas": {"Ponto Extra de Sachês/Petiscos": 29, "Small Bags": 110, "Combos Virtuais Sachês": 10, "Combos Virtuais Petiscos": 10, "Sheba Creamy - Leve 2 Pague 1": 10, "Biscrok Churrasco": 10},
+        "Minassal Ltda - Sao Joao da Boa Vista": {"Ponto Extra de Sachês/Petiscos": 55, "Small Bags": 345, "Combos Virtuais Sachês": 10, "Combos Virtuais Petiscos": 10, "Sheba Creamy - Leve 2 Pague 1": 10, "Biscrok Churrasco": 10},
+        "Minassal Ltda - Sao Jose do Rio Preto": {"Ponto Extra de Sachês/Petiscos": 47, "Small Bags": 233, "Combos Virtuais Sachês": 10, "Combos Virtuais Petiscos": 10, "Sheba Creamy - Leve 2 Pague 1": 10, "Biscrok Churrasco": 10},
+        "Minassal Ltda - Juiz de Fora": {"Ponto Extra de Sachês/Petiscos": 20, "Small Bags": 94, "Combos Virtuais Sachês": 10, "Combos Virtuais Petiscos": 10, "Sheba Creamy - Leve 2 Pague 1": 10, "Biscrok Churrasco": 10},
     },
     "P11": {
-        "Minassal Ltda - Pocos de Caldas": {"Small Bags": 110, "Ponto Extra de Sachês/Petiscos": 29, "Combos Virtuais Sachês": 10, "Combos Virtuais Petiscos": 10, "Sheba Creamy - Leve 2 Pague 1": 10},
-        "Minassal Ltda - Sao Joao da Boa Vista": {"Small Bags": 345, "Ponto Extra de Sachês/Petiscos": 55, "Combos Virtuais Sachês": 10, "Combos Virtuais Petiscos": 10, "Sheba Creamy - Leve 2 Pague 1": 10},
-        "Minassal Ltda - Sao Jose do Rio Preto": {"Small Bags": 233, "Ponto Extra de Sachês/Petiscos": 47, "Combos Virtuais Sachês": 10, "Combos Virtuais Petiscos": 10, "Sheba Creamy - Leve 2 Pague 1": 10},
-        "Minassal Ltda - Juiz de Fora": {"Small Bags": 94, "Ponto Extra de Sachês/Petiscos": 20, "Combos Virtuais Sachês": 10, "Combos Virtuais Petiscos": 10, "Sheba Creamy - Leve 2 Pague 1": 10},
+        "Minassal Ltda - Pocos de Caldas": {"Ponto Extra de Sachês/Petiscos": 29, "Small Bags": 110, "Combos Virtuais Sachês": 10, "Combos Virtuais Petiscos": 10, "Sheba Creamy - Leve 2 Pague 1": 10, "Biscrok Churrasco": 10},
+        "Minassal Ltda - Sao Joao da Boa Vista": {"Ponto Extra de Sachês/Petiscos": 55, "Small Bags": 345, "Combos Virtuais Sachês": 10, "Combos Virtuais Petiscos": 10, "Sheba Creamy - Leve 2 Pague 1": 10, "Biscrok Churrasco": 10},
+        "Minassal Ltda - Sao Jose do Rio Preto": {"Ponto Extra de Sachês/Petiscos": 47, "Small Bags": 233, "Combos Virtuais Sachês": 10, "Combos Virtuais Petiscos": 10, "Sheba Creamy - Leve 2 Pague 1": 10, "Biscrok Churrasco": 10},
+        "Minassal Ltda - Juiz de Fora": {"Ponto Extra de Sachês/Petiscos": 20, "Small Bags": 94, "Combos Virtuais Sachês": 10, "Combos Virtuais Petiscos": 10, "Sheba Creamy - Leve 2 Pague 1": 10, "Biscrok Churrasco": 10},
     },
     "P12": {
-        "Minassal Ltda - Pocos de Caldas": {"Small Bags": 120, "Ponto Extra de Sachês/Petiscos": 35, "Combos Virtuais Sachês": 12, "Combos Virtuais Petiscos": 12, "Sheba Creamy - Leve 2 Pague 1": 12},
-        "Minassal Ltda - Sao Joao da Boa Vista": {"Small Bags": 360, "Ponto Extra de Sachês/Petiscos": 60, "Combos Virtuais Sachês": 12, "Combos Virtuais Petiscos": 12, "Sheba Creamy - Leve 2 Pague 1": 12},
-        "Minassal Ltda - Sao Jose do Rio Preto": {"Small Bags": 250, "Ponto Extra de Sachês/Petiscos": 50, "Combos Virtuais Sachês": 12, "Combos Virtuais Petiscos": 12, "Sheba Creamy - Leve 2 Pague 1": 12},
-        "Minassal Ltda - Juiz de Fora": {"Small Bags": 100, "Ponto Extra de Sachês/Petiscos": 25, "Combos Virtuais Sachês": 12, "Combos Virtuais Petiscos": 12, "Sheba Creamy - Leve 2 Pague 1": 12},
+        "Minassal Ltda - Pocos de Caldas": {"Ponto Extra de Sachês/Petiscos": 30, "Small Bags": 113, "Combos Virtuais Sachês": 12, "Combos Virtuais Petiscos": 12, "Sheba Creamy - Leve 2 Pague 1": 12, "Biscrok Churrasco": 12},
+        "Minassal Ltda - Sao Joao da Boa Vista": {"Ponto Extra de Sachês/Petiscos": 57, "Small Bags": 355, "Combos Virtuais Sachês": 12, "Combos Virtuais Petiscos": 12, "Sheba Creamy - Leve 2 Pague 1": 12, "Biscrok Churrasco": 12},
+        "Minassal Ltda - Sao Jose do Rio Preto": {"Ponto Extra de Sachês/Petiscos": 48, "Small Bags": 240, "Combos Virtuais Sachês": 12, "Combos Virtuais Petiscos": 12, "Sheba Creamy - Leve 2 Pague 1": 12, "Biscrok Churrasco": 12},
+        "Minassal Ltda - Juiz de Fora": {"Ponto Extra de Sachês/Petiscos": 21, "Small Bags": 103, "Combos Virtuais Sachês": 12, "Combos Virtuais Petiscos": 12, "Sheba Creamy - Leve 2 Pague 1": 12, "Biscrok Churrasco": 12},
     },
     "P13": {
-        "Minassal Ltda - Pocos de Caldas": {"Small Bags": 110, "Ponto Extra de Sachês/Petiscos": 29, "Combos Virtuais Sachês": 10, "Combos Virtuais Petiscos": 10, "Sheba Creamy - Leve 2 Pague 1": 10},
-        "Minassal Ltda - Sao Joao da Boa Vista": {"Small Bags": 345, "Ponto Extra de Sachês/Petiscos": 55, "Combos Virtuais Sachês": 10, "Combos Virtuais Petiscos": 10, "Sheba Creamy - Leve 2 Pague 1": 10},
-        "Minassal Ltda - Sao Jose do Rio Preto": {"Small Bags": 233, "Ponto Extra de Sachês/Petiscos": 47, "Combos Virtuais Sachês": 10, "Combos Virtuais Petiscos": 10, "Sheba Creamy - Leve 2 Pague 1": 10},
-        "Minassal Ltda - Juiz de Fora": {"Small Bags": 94, "Ponto Extra de Sachês/Petiscos": 20, "Combos Virtuais Sachês": 10, "Combos Virtuais Petiscos": 10, "Sheba Creamy - Leve 2 Pague 1": 10},
+        "Minassal Ltda - Pocos de Caldas": {"Ponto Extra de Sachês/Petiscos": 30, "Small Bags": 113, "Combos Virtuais Sachês": 10, "Combos Virtuais Petiscos": 10, "Sheba Creamy - Leve 2 Pague 1": 10, "Biscrok Churrasco": 10},
+        "Minassal Ltda - Sao Joao da Boa Vista": {"Ponto Extra de Sachês/Petiscos": 57, "Small Bags": 355, "Combos Virtuais Sachês": 10, "Combos Virtuais Petiscos": 10, "Sheba Creamy - Leve 2 Pague 1": 10, "Biscrok Churrasco": 10},
+        "Minassal Ltda - Sao Jose do Rio Preto": {"Ponto Extra de Sachês/Petiscos": 48, "Small Bags": 240, "Combos Virtuais Sachês": 10, "Combos Virtuais Petiscos": 10, "Sheba Creamy - Leve 2 Pague 1": 10, "Biscrok Churrasco": 10},
+        "Minassal Ltda - Juiz de Fora": {"Ponto Extra de Sachês/Petiscos": 21, "Small Bags": 103, "Combos Virtuais Sachês": 10, "Combos Virtuais Petiscos": 10, "Sheba Creamy - Leve 2 Pague 1": 10, "Biscrok Churrasco": 10},
     }
 }
 
@@ -320,15 +320,30 @@ def salvar_configuracoes_geral(novo_dict_metas):
 
 def obter_todos_itens(periodo_sel):
     cfg_geral = carregar_configuracoes(periodo_sel)
-    itens_set = set()
+    itens_cadastrados = set()
     if isinstance(cfg_geral, dict):
         for filial, metas_f in cfg_geral.items():
             if isinstance(metas_f, dict):
                 for it in metas_f.keys():
-                    itens_set.add(it)
-    if not itens_set:
-        return ["Small Bags", "Ponto Extra de Sachês/Petiscos", "Combos Virtuais Sachês", "Combos Virtuais Petiscos", "Sheba Creamy - Leve 2 Pague 1"]
-    return sorted(list(itens_set))
+                    itens_cadastrados.add(it)
+    
+    ordem_preferencial = [
+        "Ponto Extra de Sachês/Petiscos",
+        "Small Bags",
+        "Combos Virtuais Sachês",
+        "Combos Virtuais Petiscos",
+        "Sheba Creamy - Leve 2 Pague 1",
+        "Biscrok Churrasco"
+    ]
+    
+    itens_ordenados = [it for it in ordem_preferencial if it in itens_cadastrados]
+    for it in sorted(list(itens_cadastrados)):
+        if it not in itens_ordenados:
+            itens_ordenados.append(it)
+            
+    if not itens_ordenados:
+        return ordem_preferencial
+    return itens_ordenados
 
 def carregar_dados(caminho_arquivo, periodo_sel):
     try:
@@ -1218,7 +1233,7 @@ if df is not None and not df.empty:
 
     elif pagina_selecionada == "⚙️ Gerenciar Metas":
         st.markdown(f"## Gerenciamento e Cadastro de Metas por Período e Filial")
-        st.write("Edite metas existentes, ajuste valores ou cadastre novas ações (ex: *Leituras de Biscrok Churrasco*).")
+        st.write("Edite metas existentes, ajuste valores ou cadastre novas ações.")
 
         if os.path.exists(CONFIG_FILE):
             try:
@@ -1242,7 +1257,6 @@ if df is not None and not df.empty:
         st.markdown("---")
         metas_atuais_filial = dict_metas_completo[periodo_edit].get(filial_edit, {})
 
-        # Tabela editora de metas existentes
         lista_edit_metas = []
         for item_m, meta_val in metas_atuais_filial.items():
             lista_edit_metas.append({
@@ -1278,7 +1292,7 @@ if df is not None and not df.empty:
         st.markdown("---")
         st.markdown("### ➕ Cadastrar Nova Ação / Meta")
         with st.form("form_nova_acao"):
-            nova_acao_nome = st.text_input("Nome da Nova Ação (ex: Leituras de Biscrok Churrasco):")
+            nova_acao_nome = st.text_input("Nome da Nova Ação:")
             nova_acao_meta = st.number_input("Valor da Meta Inicial:", min_value=0, value=10, step=1)
             btn_cadastrar_acao = st.form_submit_button("Cadastrar Nova Ação")
 
@@ -1288,7 +1302,7 @@ if df is not None and not df.empty:
                     if nome_limpo not in dict_metas_completo[periodo_edit][filial_edit]:
                         dict_metas_completo[periodo_edit][filial_edit][nome_limpo] = int(nova_acao_meta)
                         salvar_configuracoes_geral(dict_metas_completo)
-                        st.success(f"Ação '{nome_limpo}' cadastrada com meta {nova_acao_meta} para {filial_edit} no período {periodo_edit}!")
+                        st.success(f"Ação '{nome_limpo}' cadastrada com sucesso!")
                         time.sleep(0.8)
                         st.rerun()
                     else:
