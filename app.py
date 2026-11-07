@@ -634,15 +634,20 @@ st.markdown(
             color: #000000 !important;
             border: 1px solid {t['borda']} !important;
         }}
-        /* Correção para o menu suspenso (dropdown) ficar com fundo claro e texto legível */
-        div[data-baseweb="popover"], div[data-baseweb="menu"], ul[role="listbox"] {{
+        
+        /* CORREÇÃO DEFINITIVA PARA O MENU SUSPENSO (SELECTBOX) */
+        div[data-baseweb="popover"], div[data-baseweb="menu"], ul[role="listbox"], div[role="listbox"] {{
             background-color: #FFFFFF !important;
         }}
-        div[data-baseweb="popover"] li, div[data-baseweb="menu"] div, ul[role="listbox"] li, span[role="option"] {{
+        div[data-baseweb="popover"] * {{
             color: #000000 !important;
             background-color: #FFFFFF !important;
         }}
-        ul[role="listbox"] li:hover, div[data-baseweb="menu"] div:hover {{
+        ul[role="listbox"] li, div[role="option"], span[role="option"] {{
+            color: #000000 !important;
+            background-color: #FFFFFF !important;
+        }}
+        ul[role="listbox"] li:hover, div[role="option"]:hover, span[role="option"]:hover {{
             background-color: #E2E8F0 !important;
             color: #000000 !important;
         }}
