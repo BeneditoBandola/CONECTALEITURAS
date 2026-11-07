@@ -1,4 +1,3 @@
-import base64
 from datetime import date, datetime, timedelta
 import difflib
 import io
@@ -20,6 +19,7 @@ import streamlit as st
 from pathlib import Path
 from playwright.sync_api import sync_playwright
 import sys
+import base64
 
 # --- 1. CONFIGURAÇÕES E CONSTANTES (TELA CHEIA / WIDE) ---
 st.set_page_config(
@@ -200,31 +200,31 @@ FILIAIS = [
     "Minassal Ltda - Juiz de Fora",
 ]
 
-# --- METAS PADRÃO POR PERÍODO (ORDENADAS E ATUALIZADAS) ---
+# --- METAS PADRÃO POR PERÍODO (ATUALIZADAS COM OS NOVOS DEFAULTS) ---
 METAS_PADRAO_GERAL = {
     "P10": {
-        "Minassal Ltda - Pocos de Caldas": {"Ponto Extra de Sachês/Petiscos": 29, "Small Bags": 110, "Combos Virtuais Sachês": 10, "Combos Virtuais Petiscos": 10, "Sheba Creamy - Leve 2 Pague 1": 10, "Biscrok Churrasco": 10},
-        "Minassal Ltda - Sao Joao da Boa Vista": {"Ponto Extra de Sachês/Petiscos": 55, "Small Bags": 345, "Combos Virtuais Sachês": 10, "Combos Virtuais Petiscos": 10, "Sheba Creamy - Leve 2 Pague 1": 10, "Biscrok Churrasco": 10},
-        "Minassal Ltda - Sao Jose do Rio Preto": {"Ponto Extra de Sachês/Petiscos": 47, "Small Bags": 233, "Combos Virtuais Sachês": 10, "Combos Virtuais Petiscos": 10, "Sheba Creamy - Leve 2 Pague 1": 10, "Biscrok Churrasco": 10},
-        "Minassal Ltda - Juiz de Fora": {"Ponto Extra de Sachês/Petiscos": 20, "Small Bags": 94, "Combos Virtuais Sachês": 10, "Combos Virtuais Petiscos": 10, "Sheba Creamy - Leve 2 Pague 1": 10, "Biscrok Churrasco": 10},
+        "Minassal Ltda - Pocos de Caldas": {"Ponto Extra de Sachês/Petiscos": 29, "Small Bags": 110, "Combos Virtuais Sachês": 10, "Combos Virtuais Petiscos": 10, "Sheba Creamy - Leve 2 Pague 1": 10, "Biscrok Churrasco": 5},
+        "Minassal Ltda - Sao Joao da Boa Vista": {"Ponto Extra de Sachês/Petiscos": 55, "Small Bags": 345, "Combos Virtuais Sachês": 10, "Combos Virtuais Petiscos": 10, "Sheba Creamy - Leve 2 Pague 1": 10, "Biscrok Churrasco": 5},
+        "Minassal Ltda - Sao Jose do Rio Preto": {"Ponto Extra de Sachês/Petiscos": 47, "Small Bags": 233, "Combos Virtuais Sachês": 10, "Combos Virtuais Petiscos": 10, "Sheba Creamy - Leve 2 Pague 1": 10, "Biscrok Churrasco": 5},
+        "Minassal Ltda - Juiz de Fora": {"Ponto Extra de Sachês/Petiscos": 20, "Small Bags": 94, "Combos Virtuais Sachês": 10, "Combos Virtuais Petiscos": 10, "Sheba Creamy - Leve 2 Pague 1": 10, "Biscrok Churrasco": 5},
     },
     "P11": {
-        "Minassal Ltda - Pocos de Caldas": {"Ponto Extra de Sachês/Petiscos": 29, "Small Bags": 110, "Combos Virtuais Sachês": 10, "Combos Virtuais Petiscos": 10, "Sheba Creamy - Leve 2 Pague 1": 10, "Biscrok Churrasco": 10},
-        "Minassal Ltda - Sao Joao da Boa Vista": {"Ponto Extra de Sachês/Petiscos": 55, "Small Bags": 345, "Combos Virtuais Sachês": 10, "Combos Virtuais Petiscos": 10, "Sheba Creamy - Leve 2 Pague 1": 10, "Biscrok Churrasco": 10},
-        "Minassal Ltda - Sao Jose do Rio Preto": {"Ponto Extra de Sachês/Petiscos": 47, "Small Bags": 233, "Combos Virtuais Sachês": 10, "Combos Virtuais Petiscos": 10, "Sheba Creamy - Leve 2 Pague 1": 10, "Biscrok Churrasco": 10},
-        "Minassal Ltda - Juiz de Fora": {"Ponto Extra de Sachês/Petiscos": 20, "Small Bags": 94, "Combos Virtuais Sachês": 10, "Combos Virtuais Petiscos": 10, "Sheba Creamy - Leve 2 Pague 1": 10, "Biscrok Churrasco": 10},
+        "Minassal Ltda - Pocos de Caldas": {"Ponto Extra de Sachês/Petiscos": 29, "Small Bags": 110, "Combos Virtuais Sachês": 10, "Combos Virtuais Petiscos": 10, "Sheba Creamy - Leve 2 Pague 1": 10, "Biscrok Churrasco": 5},
+        "Minassal Ltda - Sao Joao da Boa Vista": {"Ponto Extra de Sachês/Petiscos": 55, "Small Bags": 345, "Combos Virtuais Sachês": 10, "Combos Virtuais Petiscos": 10, "Sheba Creamy - Leve 2 Pague 1": 10, "Biscrok Churrasco": 5},
+        "Minassal Ltda - Sao Jose do Rio Preto": {"Ponto Extra de Sachês/Petiscos": 47, "Small Bags": 233, "Combos Virtuais Sachês": 10, "Combos Virtuais Petiscos": 10, "Sheba Creamy - Leve 2 Pague 1": 10, "Biscrok Churrasco": 5},
+        "Minassal Ltda - Juiz de Fora": {"Ponto Extra de Sachês/Petiscos": 20, "Small Bags": 94, "Combos Virtuais Sachês": 10, "Combos Virtuais Petiscos": 10, "Sheba Creamy - Leve 2 Pague 1": 10, "Biscrok Churrasco": 5},
     },
     "P12": {
-        "Minassal Ltda - Pocos de Caldas": {"Ponto Extra de Sachês/Petiscos": 30, "Small Bags": 113, "Combos Virtuais Sachês": 12, "Combos Virtuais Petiscos": 12, "Sheba Creamy - Leve 2 Pague 1": 12, "Biscrok Churrasco": 12},
-        "Minassal Ltda - Sao Joao da Boa Vista": {"Ponto Extra de Sachês/Petiscos": 57, "Small Bags": 355, "Combos Virtuais Sachês": 12, "Combos Virtuais Petiscos": 12, "Sheba Creamy - Leve 2 Pague 1": 12, "Biscrok Churrasco": 12},
-        "Minassal Ltda - Sao Jose do Rio Preto": {"Ponto Extra de Sachês/Petiscos": 48, "Small Bags": 240, "Combos Virtuais Sachês": 12, "Combos Virtuais Petiscos": 12, "Sheba Creamy - Leve 2 Pague 1": 12, "Biscrok Churrasco": 12},
-        "Minassal Ltda - Juiz de Fora": {"Ponto Extra de Sachês/Petiscos": 21, "Small Bags": 103, "Combos Virtuais Sachês": 12, "Combos Virtuais Petiscos": 12, "Sheba Creamy - Leve 2 Pague 1": 12, "Biscrok Churrasco": 12},
+        "Minassal Ltda - Pocos de Caldas": {"Ponto Extra de Sachês/Petiscos": 30, "Small Bags": 113, "Combos Virtuais Sachês": 10, "Combos Virtuais Petiscos": 10, "Sheba Creamy - Leve 2 Pague 1": 10, "Biscrok Churrasco": 5},
+        "Minassal Ltda - Sao Joao da Boa Vista": {"Ponto Extra de Sachês/Petiscos": 57, "Small Bags": 355, "Combos Virtuais Sachês": 10, "Combos Virtuais Petiscos": 10, "Sheba Creamy - Leve 2 Pague 1": 10, "Biscrok Churrasco": 5},
+        "Minassal Ltda - Sao Jose do Rio Preto": {"Ponto Extra de Sachês/Petiscos": 48, "Small Bags": 240, "Combos Virtuais Sachês": 10, "Combos Virtuais Petiscos": 10, "Sheba Creamy - Leve 2 Pague 1": 10, "Biscrok Churrasco": 5},
+        "Minassal Ltda - Juiz de Fora": {"Ponto Extra de Sachês/Petiscos": 21, "Small Bags": 103, "Combos Virtuais Sachês": 10, "Combos Virtuais Petiscos": 10, "Sheba Creamy - Leve 2 Pague 1": 10, "Biscrok Churrasco": 5},
     },
     "P13": {
-        "Minassal Ltda - Pocos de Caldas": {"Ponto Extra de Sachês/Petiscos": 30, "Small Bags": 113, "Combos Virtuais Sachês": 10, "Combos Virtuais Petiscos": 10, "Sheba Creamy - Leve 2 Pague 1": 10, "Biscrok Churrasco": 10},
-        "Minassal Ltda - Sao Joao da Boa Vista": {"Ponto Extra de Sachês/Petiscos": 57, "Small Bags": 355, "Combos Virtuais Sachês": 10, "Combos Virtuais Petiscos": 10, "Sheba Creamy - Leve 2 Pague 1": 10, "Biscrok Churrasco": 10},
-        "Minassal Ltda - Sao Jose do Rio Preto": {"Ponto Extra de Sachês/Petiscos": 48, "Small Bags": 240, "Combos Virtuais Sachês": 10, "Combos Virtuais Petiscos": 10, "Sheba Creamy - Leve 2 Pague 1": 10, "Biscrok Churrasco": 10},
-        "Minassal Ltda - Juiz de Fora": {"Ponto Extra de Sachês/Petiscos": 21, "Small Bags": 103, "Combos Virtuais Sachês": 10, "Combos Virtuais Petiscos": 10, "Sheba Creamy - Leve 2 Pague 1": 10, "Biscrok Churrasco": 10},
+        "Minassal Ltda - Pocos de Caldas": {"Ponto Extra de Sachês/Petiscos": 30, "Small Bags": 113, "Combos Virtuais Sachês": 10, "Combos Virtuais Petiscos": 10, "Sheba Creamy - Leve 2 Pague 1": 10, "Biscrok Churrasco": 5},
+        "Minassal Ltda - Sao Joao da Boa Vista": {"Ponto Extra de Sachês/Petiscos": 57, "Small Bags": 355, "Combos Virtuais Sachês": 10, "Combos Virtuais Petiscos": 10, "Sheba Creamy - Leve 2 Pague 1": 10, "Biscrok Churrasco": 5},
+        "Minassal Ltda - Sao Jose do Rio Preto": {"Ponto Extra de Sachês/Petiscos": 48, "Small Bags": 240, "Combos Virtuais Sachês": 10, "Combos Virtuais Petiscos": 10, "Sheba Creamy - Leve 2 Pague 1": 10, "Biscrok Churrasco": 5},
+        "Minassal Ltda - Juiz de Fora": {"Ponto Extra de Sachês/Petiscos": 21, "Small Bags": 103, "Combos Virtuais Sachês": 10, "Combos Virtuais Petiscos": 10, "Sheba Creamy - Leve 2 Pague 1": 10, "Biscrok Churrasco": 5},
     }
 }
 
@@ -634,6 +634,19 @@ st.markdown(
             color: #000000 !important;
             border: 1px solid {t['borda']} !important;
         }}
+        /* Correção para o menu suspenso (dropdown) ficar com fundo claro e texto legível */
+        div[data-baseweb="popover"], div[data-baseweb="menu"], ul[role="listbox"] {{
+            background-color: #FFFFFF !important;
+        }}
+        div[data-baseweb="popover"] li, div[data-baseweb="menu"] div, ul[role="listbox"] li, span[role="option"] {{
+            color: #000000 !important;
+            background-color: #FFFFFF !important;
+        }}
+        ul[role="listbox"] li:hover, div[data-baseweb="menu"] div:hover {{
+            background-color: #E2E8F0 !important;
+            color: #000000 !important;
+        }}
+
         div.stButton > button {{
             background-color: {t['primario']} !important;
             color: #FFFFFF !important;
